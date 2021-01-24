@@ -47,6 +47,10 @@
 
 #define RGB_DI_PIN E2
 #define DRIVER_LED_TOTAL 53
-#ifdef RGB_DI_PIN
-    #define RGB_MATRIX_KEYPRESSES // reacts to keypresses
-#endif
+#define RGBLED_NUM 53
+// #ifdef RGB_DI_PIN
+//     #define RGB_MATRIX_KEYPRESSES // reacts to keypresses
+// #endif
+
+/* Enable RGB Lighting Layers */
+#define RGBLIGHT_LAYERS
