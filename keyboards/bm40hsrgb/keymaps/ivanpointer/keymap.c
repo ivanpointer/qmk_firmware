@@ -27,13 +27,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 		__VVV__, 		__VVV__, 		__VVV__, 	_____, 			KC_TAB, 			KC_ENT, 			KC_TAB, 		__VVV__, 		_____,		__VVV__, 	__VVV__),
 
 	[_NUMPAD] = LAYOUT_planck_mit(
-		TO(_DVORAK), 	_____, 			KC_COPY, 	KC_PSTE, 		KC_CUT, 		_____, 		KC_PAST, 	KC_P7, 			KC_P8, 			KC_P9, 		KC_PMNS, 	KC_BSPC,
+		TO(_DVORAK), 	_____, 			C(KC_C), 	C(KC_V), 		C(KC_X), 		_____, 		KC_PAST, 	KC_P7, 			KC_P8, 			KC_P9, 		KC_PMNS, 	KC_BSPC,
 		_____, 			KC_LSFT, 		KC_LCTL, 	KC_LGUI, 		KC_LALT, 		_____, 		KC_PSLS, 	KC_P4, 			KC_P5, 			KC_P6, 		KC_PPLS, 	_____,
 		__VVV__, 		_____, 			_____, 		_____, 			_____, 			_____, 		KC_NLCK, 	KC_P1, 			KC_P2, 			KC_P3, 		KC_PDOT, 	__VVV__,
 		__VVV__, 		__VVV__, 		__VVV__, 	__VVV__, 		_____, 				KC_PENT,			KC_P0, 			KC_P0, 			__VVV__, 	__VVV__, 	__VVV__),
 
 	[_ARROWS] = LAYOUT_planck_mit(
-		TO(_DVORAK), 	_____, 			KC_COPY, 	KC_PSTE, 		KC_CUT, 		_____, 		_____, 		KC_HOME, 		KC_UP, 			KC_END, 	KC_PGUP, 	KC_BSPC,
+		TO(_DVORAK), 	_____, 			LCTL(KC_C), LCTL(KC_V), 	LCTL(KC_X), 	_____, 		_____, 		KC_HOME, 		KC_UP, 			KC_END, 	KC_PGUP, 	KC_BSPC,
 		_____, 			KC_LSFT, 		KC_LCTL, 	KC_LGUI, 		KC_LALT, 		_____, 		_____, 		KC_LEFT, 		KC_DOWN, 		KC_RGHT, 	KC_PGDN, 	KC_DEL,
 		__VVV__, 		_____, 			_____, 		_____, 			_____, 			_____, 		_____, 		_____, 			_____, 			_____, 		_____, 		__VVV__,
 		__VVV__, 		__VVV__, 		__VVV__, 	_____, 			__VVV__, 			KC_ENT, 			KC_TAB, 		_____, 			__VVV__, 	__VVV__, 	__VVV__),
@@ -172,8 +172,7 @@ const rgblight_segment_t PROGMEM my_numpad_layer[] = RGBLIGHT_LAYER_SEGMENTS(
 const rgblight_segment_t PROGMEM my_arrows_layer[] = RGBLIGHT_LAYER_SEGMENTS(
 	{0, 47, HSV_OFF }, // Base color
 	{0, 1, PAL_LAYERS }, // TO 0
-	{2, 1, PAL_CNTRL_2 }, // Copy
-	{3, 1, 	PAL_CNTRL_2 }, // Paste
+	{2, 2, PAL_CNTRL_2 }, // Copy, Paste
 	{4, 1, PAL_DANGER }, // Cut
 	{7, 1, PAL_CNTRL_2 }, // Home
 	{8, 1, PAL_CNTRL }, // Up
