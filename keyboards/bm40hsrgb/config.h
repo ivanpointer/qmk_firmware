@@ -54,3 +54,6 @@
 
 /* Enable RGB Lighting Layers */
 #define RGBLIGHT_LAYERS
+
+/* Configure TapDance */
+#define TAPPING_TERM 150
