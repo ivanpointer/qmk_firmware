@@ -16,7 +16,7 @@ void pointing_device_init_kb(void){
 
     // read config from EEPROM and update if needed
 
-    config_pteropshera_t kb_config;
+    config_pterosphera_t kb_config;
     kb_config.raw = eeconfig_read_kb();
 
     if(!kb_config.cpi) {
@@ -68,7 +68,7 @@ static void on_cpi_button(uint16_t cpi, keyrecord_t *record) {
 
     pointing_device_set_cpi(cpi);
 
-    config_pteropshera_t kb_config;
+    config_pterosphera_t kb_config;
     kb_config.cpi = cpi;
     eeconfig_update_kb(kb_config.raw);
 }

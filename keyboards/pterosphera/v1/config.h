@@ -17,3 +17,9 @@
  */
 #define MATRIX_ROW_PINS { D4, C6, D7, E6 }
 #define MATRIX_COL_PINS { B5, B4, F1, C7, D5, B7, D3, D2 }
+
+#define PMW3389_CS_PIN F7
+
+#define RGB_DI_PIN B6
+#define RGBLED_NUM 12
+#define RGBLED_SPLIT { 6, 6 }
