@@ -94,7 +94,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 ),
 [_SHIFT2] = LAYOUT(
             TO(_BASE),             KC_7,             KC_5,             KC_3,             KC_1,             KC_9,                     KC_0,             KC_2,             KC_4,             KC_6,             KC_8,     KC_BACKSPACE,
-                  XXX,              XXX,            KC_LT,            KC_GT,        KC_DOLLAR,     KC_AMPERSAND,                 KC_MINUS,         KC_SLASH,     KC_BACKSLASH,            KC_AT,         KC_POUND,              XXX,
+            TO(_BASE),              XXX,            KC_LT,            KC_GT,        KC_DOLLAR,     KC_AMPERSAND,                 KC_MINUS,         KC_SLASH,     KC_BACKSLASH,            KC_AT,         KC_POUND,        TO(_BASE),
                   XXX,  KC_LEFT_BRACKET,    KC_LEFT_CURLY,   KC_RIGHT_CURLY,    KC_LEFT_PAREN,         KC_EQUAL,              KC_ASTERISK,   KC_RIGHT_PAREN,          KC_PLUS, KC_RIGHT_BRACKET,       KC_EXCLAIM,              XXX,
                   XXX,              XXX,              XXX,              XXX,         KC_TILDE,       KC_PERCENT,            KC_UNDERSCORE,      KC_QUESTION,          KC_PIPE,         KC_CARET,         KC_GRAVE,              XXX,
                                                       XXX,              XXX,              XXX,              XXX,                      XXX,              XXX,              XXX,              XXX,
@@ -106,7 +106,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                XXX, KC_LEFT_SHIFT,  KC_LEFT_CTRL,   KC_LEFT_ALT,   KC_LEFT_GUI,           XXX,                   XXX,       KC_LEFT,       KC_DOWN,      KC_RIGHT,  KC_PAGE_DOWN,           XXX,
                XXX,   KC_MAC_UNDO,    KC_MAC_CUT,   KC_MAC_COPY,  KC_MAC_PASTE,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
                                              XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,
-                                             XXX,           XXX,           XXX,           XXX,                   XXX,           XXX
+                                             XXX,           XXX,     TO(_BASE),           XXX,                   XXX,           XXX
 ),
 [_NUMPAD] = LAYOUT(
           TO(_BASE),            XXX,            XXX,            XXX,            XXX,            XXX,                    XXX,    KC_NUM_LOCK,    KC_KP_SLASH, KC_KP_ASTERISK,    KC_KP_MINUS,   KC_BACKSPACE,
@@ -114,7 +114,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                 XXX,  KC_LEFT_SHIFT,   KC_LEFT_CTRL,    KC_LEFT_ALT,    KC_LEFT_GUI,            XXX,                    XXX,        KC_KP_4,        KC_KP_5,        KC_KP_6,            XXX,      KC_DELETE,
                 XXX,            XXX,            XXX,            XXX,            XXX,            XXX,                    XXX,        KC_KP_1,        KC_KP_2,        KC_KP_3,            XXX,            XXX,
                                                 XXX,            XXX,            XXX,            XXX,            KC_KP_ENTER,        KC_KP_0,            XXX,      KC_KP_DOT,
-                                                XXX,            XXX,            XXX,            XXX,                    XXX,            XXX
+                                                XXX,            XXX,            XXX,      TO(_BASE),                    XXX,            XXX
 ),
 [_FNKEYS] = LAYOUT(
          TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
@@ -122,7 +122,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                XXX,         KC_F5,         KC_F6,         KC_F7,         KC_F8,           XXX,                   XXX,   KC_LEFT_GUI,   KC_LEFT_ALT,  KC_LEFT_CTRL, KC_LEFT_SHIFT,           XXX,
                XXX,         KC_F9,        KC_F10,        KC_F11,        KC_F12,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
                                              XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,
-                                             XXX,           XXX,           XXX,           XXX,          TT(_FNKEYS2),           XXX
+                                             XXX,           XXX,           XXX,           XXX,          TT(_FNKEYS2),     TO(_BASE)
 ),
 [_FNKEYS2] = LAYOUT(
          TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,         RESET,
@@ -130,7 +130,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                XXX,        KC_F17,        KC_F18,        KC_F19,        KC_F20,           XXX,                   XXX,   KC_LEFT_GUI,   KC_LEFT_ALT,  KC_LEFT_CTRL, KC_LEFT_SHIFT,           XXX,
                XXX,        KC_F21,        KC_F22,        KC_F23,        KC_F24,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
                                              XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,
-                                             XXX,           XXX,           XXX,           XXX,                   XXX,           XXX
+                                             XXX,           XXX,           XXX,           XXX,             TO(_BASE),           XXX
 ),
 [_MOUSE] = LAYOUT(
          TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
