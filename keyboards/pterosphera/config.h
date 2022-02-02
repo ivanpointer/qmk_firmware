@@ -66,6 +66,8 @@
 #define ADNS9800_CS_PIN SPI_SS_PIN
 #define PMW3360_CS_PIN SPI_SS_PIN
 
+#define TAPPING_TOGGLE 2
+
 //#define LED_NUM_LOCK_PIN B0
 //#define LED_CAPS_LOCK_PIN B1
 //#define LED_SCROLL_LOCK_PIN B2
@@ -95,7 +97,7 @@
 //#    define RGBLIGHT_EFFECT_CHRISTMAS
 //#    define RGBLIGHT_EFFECT_STATIC_GRADIENT`
 //#    define RGBLIGHT_EFFECT_RGB_TEST
-#    define RGBLIGHT_EFFECT_ALTERNATING
+//#    define RGBLIGHT_EFFECT_ALTERNATING
 /*== customize breathing effect ==*/
 /*==== (DEFAULT) use fixed table instead of exp() and sin() ====*/
 //#    define RGBLIGHT_BREATHE_TABLE_SIZE 256      // 256(default) or 128 or 64

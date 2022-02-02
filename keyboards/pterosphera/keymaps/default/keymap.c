@@ -4,6 +4,7 @@
 // https://docs.google.com/spreadsheets/d/1jgQjds1BM_JUTmnuVx91Nt6bxBOcC_TLZnX9TBECRXk
 
 #include QMK_KEYBOARD_H
+#include "stdbool.h"
 
 #define XXX             KC_NO
 #define ___	            KC_TRNS
@@ -37,6 +38,49 @@ enum layer_names {
     _FNKEYS,
     _FNKEYS2,
     _MOUSE
+};
+
+bool _myCapsState;
+uint8_t _myLayer;
+
+void led_set_user(uint8_t usb_led) {
+  _myCapsState = usb_led & (1<<USB_LED_CAPS_LOCK);
+    switch(_myCapsState) {
+    case true:
+        rgblight_mode_noeeprom(RGBLIGHT_MODE_BREATHING + 3);
+        break;
+    default:
+        rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_LIGHT);
+        break;
+    }
+}
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+    _myLayer = biton32(state);
+    switch (_myLayer) {
+        case _SHIFT2: // Shifted Layer (Linux)
+            rgblight_sethsv(HSV_CYAN);
+            break;
+        case _ARROWS: // Bone (Mac)
+            rgblight_sethsv(HSV_GREEN);
+            break;
+        case _NUMPAD: // Shifted (Mac)
+            rgblight_sethsv(HSV_ORANGE);
+            break;
+        case _FNKEYS: // Utility
+            rgblight_sethsv(HSV_BLUE);
+            break;
+        case _FNKEYS2: // Utility
+            rgblight_sethsv(HSV_WHITE);
+            break;
+        case _MOUSE: // Utility
+            rgblight_sethsv(HSV_ORANGE);
+            break;
+        default:
+            rgblight_sethsv(HSV_RED);
+            break;
+    }
+    return state;
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
