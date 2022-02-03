@@ -89,8 +89,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                   KC_CAPS_LOCK,              KC_SEMICOLON,                  KC_COMMA,                    KC_DOT,                      KC_P,                      KC_Y,                              KC_F,                      KC_G,                      KC_C,                      KC_R,                      KC_L,                 LCA(KC_C),
      LT(_SHIFT2, KC_CAPS_LOCK),                      KC_A,                      KC_O,                      KC_E,                      KC_U,                      KC_I,                              KC_D,                      KC_H,                      KC_T,                      KC_N,                      KC_S,               MO(_SHIFT2),
                  KC_LEFT_SHIFT,          LCTL_T(KC_QUOTE),                      KC_Q,                      KC_J,                      KC_K,                      KC_X,                              KC_B,                      KC_M,                      KC_W,                      KC_V,              RCTL_T(KC_Z),            KC_RIGHT_SHIFT,
-                                                                         KC_LEFT_ALT,               KC_LEFT_GUI,                  KC_ENTER,                    KC_TAB,                        TT(_MOUSE),                  KC_SPACE,              KC_RIGHT_GUI,              KC_RIGHT_ALT,
-                                                                          KC_MS_BTN1,                KC_MS_BTN2,                 KC_SCROLL,                KC_MS_BTN3,                       TT(_ARROWS),                       XXX
+                                                                         KC_LEFT_ALT,               KC_LEFT_GUI,                KC_MS_BTN1,                KC_MS_BTN2,                          KC_SPACE,                TT(_MOUSE),              KC_RIGHT_GUI,              KC_RIGHT_ALT,
+                                                                            KC_ENTER,                    KC_TAB,                 KC_SCROLL,                KC_MS_BTN3,                       TT(_ARROWS),                       XXX
 ),
 [_SHIFT2] = LAYOUT(
             TO(_BASE),             KC_7,             KC_5,             KC_3,             KC_1,             KC_9,                     KC_0,             KC_2,             KC_4,             KC_6,             KC_8,     KC_BACKSPACE,
@@ -137,7 +137,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                XXX,           XXX,           XXX,           XXX,           XXX,           XXX,              KC_CPI_1,           XXX,           XXX,           XXX,           XXX,           XXX,
                XXX, KC_LEFT_SHIFT,  KC_LEFT_CTRL,   KC_LEFT_ALT,   KC_LEFT_GUI,           XXX,              KC_CPI_2,    KC_MS_BTN1,    KC_MS_BTN2,     KC_SCROLL,           XXX,           XXX,
                XXX,   KC_MAC_UNDO,    KC_MAC_CUT,   KC_MAC_COPY,  KC_MAC_PASTE,           XXX,              KC_CPI_3,           XXX,    KC_MS_BTN3,           XXX,           XXX,           XXX,
-                                             XXX,           XXX,           XXX,           XXX,             TO(_BASE),           XXX,           XXX,           XXX,
-                                      KC_MS_BTN1,    KC_MS_BTN2,     KC_SCROLL,    KC_MS_BTN3,                   XXX,           XXX
+                                             XXX,           XXX,    KC_MS_BTN1,    KC_MS_BTN2,              KC_SPACE,     TO(_BASE),           XXX,           XXX,
+                                        KC_ENTER,        KC_TAB,     KC_SCROLL,    KC_MS_BTN3,                   XXX,           XXX
 )
 };
