@@ -3,6 +3,7 @@
 
 #include "pterosphera.h"
 #include "pointing_device.h"
+
 extern const pointing_device_driver_t pointing_device_driver;
 
 static bool scroll_pressed;
@@ -39,8 +40,8 @@ report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
         scroll_h += clamped_x;
         scroll_v += clamped_y;
 
-        int8_t scaled_scroll_h = scroll_h / SCROLL_DIVIDER;
-        int8_t scaled_scroll_v = scroll_v / SCROLL_DIVIDER;
+        int8_t scaled_scroll_h = scroll_h / SCROLL_DIVISOR;
+        int8_t scaled_scroll_v = scroll_v / SCROLL_DIVISOR;
 
         // clear accumulated scroll on assignment
 
@@ -62,7 +63,6 @@ report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
 }
 
 static void on_cpi_button(uint16_t cpi, keyrecord_t *record) {
-
     if(!record->event.pressed)
         return;
 

@@ -58,15 +58,23 @@
 
 /* optical sensor settings */
 #define PMW3360_FIRMWARE_H "pmw3389_firmware.h"
-#define SCROLL_DIVIDER 12
-#define CPI_1 2000
-#define CPI_2 4000
-#define CPI_3 8000
+// The higher the number, the slower the scroll
+#define SCROLL_DIVISOR 90
 
+// Times to tap for a TT before switching layers
+// I suggest 1 if the layers are stacked (like a planck), 2 if all layers are mapped to the base.
+#define TAPPING_TOGGLE 1
+#define PERMISSIVE_HOLD
+#define TAPPING_TERM 200
+
+// The levels of sensitivity for the trackball
+#define CPI_1 300
+#define CPI_2 3000
+#define CPI_3 6000
+
+// Map the mouse sensor pin for the different drivers
 #define ADNS9800_CS_PIN SPI_SS_PIN
 #define PMW3360_CS_PIN SPI_SS_PIN
-
-#define TAPPING_TOGGLE 2
 
 //#define LED_NUM_LOCK_PIN B0
 //#define LED_CAPS_LOCK_PIN B1
