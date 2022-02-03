@@ -58,6 +58,7 @@
 
 /* optical sensor settings */
 #define PMW3360_FIRMWARE_H "pmw3389_firmware.h"
+#define ROTATIONAL_TRANSFORM_ANGLE -15
 // The higher the number, the slower the scroll
 #define SCROLL_DIVISOR 90
 

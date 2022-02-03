@@ -28,6 +28,11 @@
 #define KC_MAC_CUT	    LGUI(KC_X)
 #define KC_MAC_COPY	    LGUI(KC_C)
 #define KC_MAC_PASTE	LGUI(KC_V)
+#define MAC_LAUNCHPAD	LAG(KC_F4)
+#define MAC_MISCTL	    LCTL(KC_UP)
+#define MAC_APPWIN	    LCTL(KC_DOWN)
+#define MAC_DESK_NEXT	LCTL(KC_RIGHT)
+#define MAC_DESK_PREV	LCTL(KC_LEFT)
 
 // Defines names for use in layer keycodes and the keymap
 enum layer_names {
@@ -86,7 +91,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_BASE] = LAYOUT(
                      KC_ESCAPE,           KC_LEFT_BRACKET,             KC_LEFT_CURLY,            KC_RIGHT_CURLY,             KC_LEFT_PAREN,                  KC_EQUAL,                       KC_ASTERISK,            KC_RIGHT_PAREN,                   KC_PLUS,          KC_RIGHT_BRACKET,                KC_EXCLAIM,              KC_BACKSPACE,
-                  KC_CAPS_LOCK,              KC_SEMICOLON,                  KC_COMMA,                    KC_DOT,                      KC_P,                      KC_Y,                              KC_F,                      KC_G,                      KC_C,                      KC_R,                      KC_L,                 LCA(KC_C),
+                  KC_CAPS_LOCK,              KC_SEMICOLON,                  KC_COMMA,                    KC_DOT,                      KC_P,                      KC_Y,                              KC_F,                      KC_G,                      KC_C,                      KC_R,                      KC_L,                       XXX,
      LT(_SHIFT2, KC_CAPS_LOCK),                      KC_A,                      KC_O,                      KC_E,                      KC_U,                      KC_I,                              KC_D,                      KC_H,                      KC_T,                      KC_N,                      KC_S,               MO(_SHIFT2),
                  KC_LEFT_SHIFT,          LCTL_T(KC_QUOTE),                      KC_Q,                      KC_J,                      KC_K,                      KC_X,                              KC_B,                      KC_M,                      KC_W,                      KC_V,              RCTL_T(KC_Z),            KC_RIGHT_SHIFT,
                                                                          KC_LEFT_ALT,               KC_LEFT_GUI,                KC_MS_BTN1,                KC_MS_BTN2,                          KC_SPACE,                TT(_MOUSE),              KC_RIGHT_GUI,              KC_RIGHT_ALT,
@@ -105,8 +110,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       KC_CAPS_LOCK,           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,       KC_HOME,         KC_UP,        KC_END,    KC_PAGE_UP,           XXX,
                XXX, KC_LEFT_SHIFT,  KC_LEFT_CTRL,   KC_LEFT_ALT,   KC_LEFT_GUI,           XXX,                   XXX,       KC_LEFT,       KC_DOWN,      KC_RIGHT,  KC_PAGE_DOWN,           XXX,
                XXX,   KC_MAC_UNDO,    KC_MAC_CUT,   KC_MAC_COPY,  KC_MAC_PASTE,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
-                                             XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,
-                                             XXX,           XXX,     TO(_BASE),           XXX,           TT(_NUMPAD),     TO(_BASE)
+                                             XXX,           XXX, MAC_DESK_PREV, MAC_DESK_NEXT,                   XXX,           XXX,           XXX,           XXX,
+                                      MAC_MISCTL,    HYPR(KC_P),    MAC_APPWIN, MAC_LAUNCHPAD,           TT(_NUMPAD),     TO(_BASE)
 ),
 [_NUMPAD] = LAYOUT(
           TO(_BASE),            XXX,            XXX,            XXX,            XXX,            XXX,                    XXX,    KC_NUM_LOCK,    KC_KP_SLASH, KC_KP_ASTERISK,    KC_KP_MINUS,   KC_BACKSPACE,
