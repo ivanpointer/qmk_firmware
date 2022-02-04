@@ -106,10 +106,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                                       XXX,              XXX,              XXX,              XXX,                      XXX,              XXX
 ),
 [_ARROWS] = LAYOUT(
-         TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,      KC_PAUSE,     KC_INSERT,
-      KC_CAPS_LOCK,           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,       KC_HOME,         KC_UP,        KC_END,    KC_PAGE_UP,           XXX,
+         TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,      KC_PAUSE,  KC_BACKSPACE,
+      KC_CAPS_LOCK,           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,       KC_HOME,         KC_UP,        KC_END,    KC_PAGE_UP,     KC_INSERT,
                XXX, KC_LEFT_SHIFT,  KC_LEFT_CTRL,   KC_LEFT_ALT,   KC_LEFT_GUI,           XXX,                   XXX,       KC_LEFT,       KC_DOWN,      KC_RIGHT,  KC_PAGE_DOWN,           XXX,
-               XXX,   KC_MAC_UNDO,    KC_MAC_CUT,   KC_MAC_COPY,  KC_MAC_PASTE,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
+               XXX,   KC_MAC_UNDO,    KC_MAC_CUT,   KC_MAC_COPY,  KC_MAC_PASTE,           XXX,                   XXX,    KC_MS_BTN4,           XXX,    KC_MS_BTN5,           XXX,           XXX,
                                              XXX,           XXX, MAC_DESK_PREV, MAC_DESK_NEXT,                   XXX,           XXX,           XXX,           XXX,
                                       MAC_MISCTL,    HYPR(KC_P),    MAC_APPWIN, MAC_LAUNCHPAD,           TT(_NUMPAD),     TO(_BASE)
 ),

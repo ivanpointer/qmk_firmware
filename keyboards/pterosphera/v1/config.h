@@ -21,5 +21,5 @@
 #define PMW3389_CS_PIN F7
 
 #define RGB_DI_PIN B6
-#define RGBLED_NUM 12
-#define RGBLED_SPLIT { 6, 6 }
+#define RGBLED_NUM 16
+#define RGBLED_SPLIT { 8, 8 }
