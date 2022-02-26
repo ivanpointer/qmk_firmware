@@ -34,19 +34,25 @@
 #define MAC_DESK_NEXT	LCTL(KC_RIGHT)
 #define MAC_DESK_PREV	LCTL(KC_LEFT)
 
+
+// Define the layer colors
+#define COLOR_BASE HSV_RED
+
 // Defines names for use in layer keycodes and the keymap
 enum layer_names {
     _BASE,
     _SHIFT2,
-    _ARROWS,
     _NUMPAD,
     _FNKEYS,
     _FNKEYS2,
-    _MOUSE
+    _MOUSE,
+    _ARROWS
 };
 
-bool _myCapsState;
-uint8_t _myLayer;
+#ifdef RGBLIGHT_ENABLE
+
+static bool _myCapsState;
+static uint8_t _myLayer;
 
 void led_set_user(uint8_t usb_led) {
   _myCapsState = usb_led & (1<<USB_LED_CAPS_LOCK);
@@ -64,10 +70,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     _myLayer = biton32(state);
     switch (_myLayer) {
         case _SHIFT2: // Shifted Layer (Linux)
-            rgblight_sethsv(HSV_CYAN);
-            break;
-        case _ARROWS: // Bone (Mac)
-            rgblight_sethsv(HSV_GREEN);
+            rgblight_sethsv(HSV_PURPLE);
             break;
         case _NUMPAD: // Shifted (Mac)
             rgblight_sethsv(HSV_ORANGE);
@@ -81,68 +84,73 @@ layer_state_t layer_state_set_user(layer_state_t state) {
         case _MOUSE: // Utility
             rgblight_sethsv(HSV_ORANGE);
             break;
+        case _ARROWS: // Bone (Mac)
+            rgblight_sethsv(HSV_GREEN);
+            break;
         default:
-            rgblight_sethsv(HSV_RED);
+            rgblight_sethsv(COLOR_BASE);
             break;
     }
     return state;
 };
 
+#endif
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_BASE] = LAYOUT(
-                     KC_ESCAPE,           KC_LEFT_BRACKET,             KC_LEFT_CURLY,            KC_RIGHT_CURLY,             KC_LEFT_PAREN,                  KC_EQUAL,                       KC_ASTERISK,            KC_RIGHT_PAREN,                   KC_PLUS,          KC_RIGHT_BRACKET,                KC_EXCLAIM,              KC_BACKSPACE,
-                  KC_CAPS_LOCK,              KC_SEMICOLON,                  KC_COMMA,                    KC_DOT,                      KC_P,                      KC_Y,                              KC_F,                      KC_G,                      KC_C,                      KC_R,                      KC_L,                       XXX,
-     LT(_SHIFT2, KC_CAPS_LOCK),                      KC_A,                      KC_O,                      KC_E,                      KC_U,                      KC_I,                              KC_D,                      KC_H,                      KC_T,                      KC_N,                      KC_S,               MO(_SHIFT2),
-                 KC_LEFT_SHIFT,          LCTL_T(KC_QUOTE),                      KC_Q,                      KC_J,                      KC_K,                      KC_X,                              KC_B,                      KC_M,                      KC_W,                      KC_V,              RCTL_T(KC_Z),            KC_RIGHT_SHIFT,
-                                                                         KC_LEFT_ALT,               KC_LEFT_GUI,                KC_MS_BTN1,                KC_MS_BTN2,                          KC_SPACE,                TT(_MOUSE),              KC_RIGHT_GUI,              KC_RIGHT_ALT,
-                                                                            KC_ENTER,                    KC_TAB,                 KC_SCROLL,                KC_MS_BTN3,                       TT(_ARROWS),                       XXX
+            KC_ESCAPE,  KC_LEFT_BRACKET,    KC_LEFT_CURLY,   KC_RIGHT_CURLY,    KC_LEFT_PAREN,         KC_EQUAL,              KC_ASTERISK,   KC_RIGHT_PAREN,          KC_PLUS, KC_RIGHT_BRACKET,       KC_EXCLAIM,     KC_BACKSPACE,
+          MO(_SHIFT2),     KC_SEMICOLON,         KC_COMMA,           KC_DOT,             KC_P,             KC_Y,                     KC_F,             KC_G,             KC_C,             KC_R,             KC_L,      MO(_SHIFT2),
+        KC_LEFT_SHIFT,             KC_A,             KC_O,             KC_E,             KC_U,             KC_I,                     KC_D,             KC_H,             KC_T,             KC_N,             KC_S,   KC_RIGHT_SHIFT,
+         KC_LEFT_CTRL,         KC_QUOTE,             KC_Q,             KC_J,             KC_K,             KC_X,                     KC_B,             KC_M,             KC_W,             KC_V,             KC_Z,    KC_RIGHT_CTRL,
+                                              KC_LEFT_ALT,      KC_LEFT_GUI,       KC_MS_BTN1,       KC_MS_BTN2,                 KC_SPACE,       TT(_MOUSE),     KC_RIGHT_GUI,     KC_RIGHT_ALT,
+                                                 KC_ENTER,           KC_TAB,        KC_SCROLL,       KC_MS_BTN3,              TT(_ARROWS),              XXX
 ),
 [_SHIFT2] = LAYOUT(
             TO(_BASE),             KC_7,             KC_5,             KC_3,             KC_1,             KC_9,                     KC_0,             KC_2,             KC_4,             KC_6,             KC_8,     KC_BACKSPACE,
             TO(_BASE),              XXX,            KC_LT,            KC_GT,        KC_DOLLAR,     KC_AMPERSAND,                 KC_MINUS,         KC_SLASH,     KC_BACKSLASH,            KC_AT,         KC_POUND,        TO(_BASE),
-                  XXX,  KC_LEFT_BRACKET,    KC_LEFT_CURLY,   KC_RIGHT_CURLY,    KC_LEFT_PAREN,         KC_EQUAL,              KC_ASTERISK,   KC_RIGHT_PAREN,          KC_PLUS, KC_RIGHT_BRACKET,       KC_EXCLAIM,              XXX,
-                  XXX,              XXX,              XXX,              XXX,         KC_TILDE,       KC_PERCENT,            KC_UNDERSCORE,      KC_QUESTION,          KC_PIPE,         KC_CARET,         KC_GRAVE,              XXX,
-                                                      XXX,              XXX,              XXX,              XXX,                      XXX,              XXX,              XXX,              XXX,
-                                                      XXX,              XXX,              XXX,              XXX,                      XXX,              XXX
-),
-[_ARROWS] = LAYOUT(
-         TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,      KC_PAUSE,  KC_BACKSPACE,
-      KC_CAPS_LOCK,           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,       KC_HOME,         KC_UP,        KC_END,    KC_PAGE_UP,     KC_INSERT,
-               XXX, KC_LEFT_SHIFT,  KC_LEFT_CTRL,   KC_LEFT_ALT,   KC_LEFT_GUI,           XXX,                   XXX,       KC_LEFT,       KC_DOWN,      KC_RIGHT,  KC_PAGE_DOWN,           XXX,
-               XXX,   KC_MAC_UNDO,    KC_MAC_CUT,   KC_MAC_COPY,  KC_MAC_PASTE,           XXX,                   XXX,    KC_MS_BTN4,           XXX,    KC_MS_BTN5,           XXX,           XXX,
-                                             XXX,           XXX, MAC_DESK_PREV, MAC_DESK_NEXT,                   XXX,           XXX,           XXX,           XXX,
-                                      MAC_MISCTL,    HYPR(KC_P),    MAC_APPWIN, MAC_LAUNCHPAD,           TT(_NUMPAD),     TO(_BASE)
+                  ___,  KC_LEFT_BRACKET,    KC_LEFT_CURLY,   KC_RIGHT_CURLY,    KC_LEFT_PAREN,         KC_EQUAL,              KC_ASTERISK,   KC_RIGHT_PAREN,          KC_PLUS, KC_RIGHT_BRACKET,       KC_EXCLAIM,              ___,
+                  ___,              ___,              XXX,              XXX,         KC_TILDE,       KC_PERCENT,            KC_UNDERSCORE,      KC_QUESTION,          KC_PIPE,         KC_CARET,         KC_GRAVE,              ___,
+                                                      ___,              ___,              ___,              ___,                      ___,              ___,              ___,              ___,
+                                                      ___,              ___,              ___,              ___,                      XXX,              XXX
 ),
 [_NUMPAD] = LAYOUT(
           TO(_BASE),            XXX,            XXX,            XXX,            XXX,            XXX,                    XXX,    KC_NUM_LOCK,    KC_KP_SLASH, KC_KP_ASTERISK,    KC_KP_MINUS,   KC_BACKSPACE,
                 XXX,            XXX,            XXX,            XXX,            XXX,            XXX,                    XXX,        KC_KP_7,        KC_KP_8,        KC_KP_9,     KC_KP_PLUS,      KC_ESCAPE,
-                XXX,  KC_LEFT_SHIFT,   KC_LEFT_CTRL,    KC_LEFT_ALT,    KC_LEFT_GUI,            XXX,                    XXX,        KC_KP_4,        KC_KP_5,        KC_KP_6,            XXX,      KC_DELETE,
-                XXX,            XXX,            XXX,            XXX,            XXX,            XXX,                    XXX,        KC_KP_1,        KC_KP_2,        KC_KP_3,            XXX,            XXX,
-                                                XXX,            XXX,            XXX,            XXX,            KC_KP_ENTER,        KC_KP_0,            XXX,      KC_KP_DOT,
-                                                XXX,            XXX,            XXX,      TO(_BASE),            TT(_FNKEYS),    TT(_NUMPAD)
+                ___,  KC_LEFT_SHIFT,   KC_LEFT_CTRL,    KC_LEFT_ALT,    KC_LEFT_GUI,            XXX,                    XXX,        KC_KP_4,        KC_KP_5,        KC_KP_6,            XXX,            XXX,
+                ___,            XXX,            XXX,            XXX,            XXX,            XXX,                    XXX,        KC_KP_1,        KC_KP_2,        KC_KP_3,            XXX,            XXX,
+                                                ___,            ___,            ___,            ___,            KC_KP_ENTER,        KC_KP_0,            XXX,      KC_KP_DOT,
+                                                ___,            ___,            ___,            ___,            TT(_FNKEYS),    TT(_NUMPAD)
 ),
 [_FNKEYS] = LAYOUT(
-         TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
+         TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           ___,
                XXX,         KC_F1,         KC_F2,         KC_F3,         KC_F4,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
-               XXX,         KC_F5,         KC_F6,         KC_F7,         KC_F8,           XXX,                   XXX,   KC_LEFT_GUI,   KC_LEFT_ALT,  KC_LEFT_CTRL, KC_LEFT_SHIFT,           XXX,
-               XXX,         KC_F9,        KC_F10,        KC_F11,        KC_F12,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
-                                             XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,
-                                             XXX,           XXX,           XXX,           XXX,          TT(_FNKEYS2),   TT(_NUMPAD)
+               ___,         KC_F5,         KC_F6,         KC_F7,         KC_F8,           XXX,                   XXX,   KC_LEFT_GUI,   KC_LEFT_ALT,  KC_LEFT_CTRL, KC_LEFT_SHIFT,           ___,
+               ___,         KC_F9,        KC_F10,        KC_F11,        KC_F12,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           ___,
+                                             ___,           ___,           ___,           ___,                   ___,           ___,           ___,           ___,
+                                             ___,           ___,           ___,           ___,          TT(_FNKEYS2),   TT(_NUMPAD)
 ),
 [_FNKEYS2] = LAYOUT(
          TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,         RESET,
                XXX,        KC_F13,        KC_F14,        KC_F15,        KC_F16,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
-               XXX,        KC_F17,        KC_F18,        KC_F19,        KC_F20,           XXX,                   XXX,   KC_LEFT_GUI,   KC_LEFT_ALT,  KC_LEFT_CTRL, KC_LEFT_SHIFT,           XXX,
-               XXX,        KC_F21,        KC_F22,        KC_F23,        KC_F24,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
-                                             XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,
-                                             XXX,           XXX,           XXX,           XXX,                   XXX,   TT(_FNKEYS)
+               ___,        KC_F17,        KC_F18,        KC_F19,        KC_F20,           XXX,                   XXX,   KC_LEFT_GUI,   KC_LEFT_ALT,  KC_LEFT_CTRL, KC_LEFT_SHIFT,           ___,
+               ___,        KC_F21,        KC_F22,        KC_F23,        KC_F24,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           ___,
+                                             ___,           ___,           ___,           ___,                   ___,           ___,           ___,           ___,
+                                             ___,           ___,           ___,           ___,                   XXX,   TT(_FNKEYS)
 ),
 [_MOUSE] = LAYOUT(
-         TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           XXX,
+         TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,  KC_BACKSPACE,
                XXX,           XXX,           XXX,           XXX,           XXX,           XXX,              KC_CPI_1,           XXX,           XXX,           XXX,           XXX,           XXX,
-               XXX, KC_LEFT_SHIFT,  KC_LEFT_CTRL,   KC_LEFT_ALT,   KC_LEFT_GUI,           XXX,              KC_CPI_2,    KC_MS_BTN1,    KC_MS_BTN2,     KC_SCROLL,           XXX,           XXX,
-               XXX,   KC_MAC_UNDO,    KC_MAC_CUT,   KC_MAC_COPY,  KC_MAC_PASTE,           XXX,              KC_CPI_3,           XXX,    KC_MS_BTN3,           XXX,           XXX,           XXX,
-                                             XXX,           XXX,    KC_MS_BTN1,    KC_MS_BTN2,              KC_SPACE,     TO(_BASE),           XXX,           XXX,
-                                        KC_ENTER,        KC_TAB,     KC_SCROLL,    KC_MS_BTN3,                   XXX,           XXX
+               ___, KC_LEFT_SHIFT,  KC_LEFT_CTRL,   KC_LEFT_ALT,   KC_LEFT_GUI,           XXX,              KC_CPI_2,    KC_MS_BTN1,    KC_MS_BTN2,     KC_SCROLL,           XXX,           ___,
+               ___,   KC_MAC_UNDO,    KC_MAC_CUT,   KC_MAC_COPY,  KC_MAC_PASTE,           XXX,              KC_CPI_3,           XXX,    KC_MS_BTN3,           XXX,           XXX,           ___,
+                                             ___,           ___,           ___,           ___,                   ___,     TO(_BASE),           ___,           ___,
+                                             ___,           ___,           ___,           ___,                   XXX,           XXX
+),
+[_ARROWS] = LAYOUT(
+         TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,      KC_PAUSE,  KC_BACKSPACE,
+      KC_CAPS_LOCK,           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,       KC_HOME,         KC_UP,        KC_END,    KC_PAGE_UP,     KC_INSERT,
+               ___, KC_LEFT_SHIFT,  KC_LEFT_CTRL,   KC_LEFT_ALT,   KC_LEFT_GUI,           XXX,                   XXX,       KC_LEFT,       KC_DOWN,      KC_RIGHT,  KC_PAGE_DOWN,           ___,
+               ___,   KC_MAC_UNDO,    KC_MAC_CUT,   KC_MAC_COPY,  KC_MAC_PASTE,           XXX,                   XXX,    KC_MS_BTN4,           XXX,    KC_MS_BTN5,           XXX,           ___,
+                                             ___,           ___, MAC_DESK_PREV, MAC_DESK_NEXT,                   ___,           ___,           ___,           ___,
+                                      MAC_MISCTL,    HYPR(KC_P),    MAC_APPWIN, MAC_LAUNCHPAD,           TT(_NUMPAD),     TO(_BASE)
 )
 };
