@@ -34,7 +34,6 @@
 #define MAC_DESK_NEXT	LCTL(KC_RIGHT)
 #define MAC_DESK_PREV	LCTL(KC_LEFT)
 
-
 // Define the layer colors
 #define COLOR_BASE HSV_RED
 
@@ -42,11 +41,11 @@
 enum layer_names {
     _BASE,
     _SHIFT2,
+    _ARROWS,
     _NUMPAD,
     _FNKEYS,
     _FNKEYS2,
-    _MOUSE,
-    _ARROWS
+    _MOUSE
 };
 
 #ifdef RGBLIGHT_ENABLE
@@ -69,23 +68,23 @@ void led_set_user(uint8_t usb_led) {
 layer_state_t layer_state_set_user(layer_state_t state) {
     _myLayer = biton32(state);
     switch (_myLayer) {
-        case _SHIFT2: // Shifted Layer (Linux)
+        case _SHIFT2:
             rgblight_sethsv(HSV_PURPLE);
             break;
-        case _NUMPAD: // Shifted (Mac)
+        case _ARROWS:
+            rgblight_sethsv(HSV_GREEN);
+            break;
+        case _NUMPAD:
             rgblight_sethsv(HSV_ORANGE);
             break;
-        case _FNKEYS: // Utility
+        case _FNKEYS:
             rgblight_sethsv(HSV_BLUE);
             break;
-        case _FNKEYS2: // Utility
+        case _FNKEYS2:
             rgblight_sethsv(HSV_WHITE);
             break;
-        case _MOUSE: // Utility
+        case _MOUSE:
             rgblight_sethsv(HSV_ORANGE);
-            break;
-        case _ARROWS: // Bone (Mac)
-            rgblight_sethsv(HSV_GREEN);
             break;
         default:
             rgblight_sethsv(COLOR_BASE);
@@ -119,7 +118,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                 ___,  KC_LEFT_SHIFT,   KC_LEFT_CTRL,    KC_LEFT_ALT,    KC_LEFT_GUI,            XXX,                    XXX,        KC_KP_4,        KC_KP_5,        KC_KP_6,            XXX,            XXX,
                 ___,            XXX,            XXX,            XXX,            XXX,            XXX,                    XXX,        KC_KP_1,        KC_KP_2,        KC_KP_3,            XXX,            XXX,
                                                 ___,            ___,            ___,            ___,            KC_KP_ENTER,        KC_KP_0,            XXX,      KC_KP_DOT,
-                                                ___,            ___,            ___,            ___,            TT(_FNKEYS),    TT(_NUMPAD)
+                                                ___,            ___,            ___,            ___,            TT(_FNKEYS),    TT(_ARROWS)
 ),
 [_FNKEYS] = LAYOUT(
          TO(_BASE),           XXX,           XXX,           XXX,           XXX,           XXX,                   XXX,           XXX,           XXX,           XXX,           XXX,           ___,
