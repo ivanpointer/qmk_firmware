@@ -7,13 +7,11 @@
 #define MBCK MS_BTN4
 #define MFWD MS_BTN5
 
-// Placeholders for DPI adjustments for trackball
-#define CPI_UP   KC_NO
-#define CPI_DOWN KC_NO
-#define CPI_DFLT KC_NO
-
-// Trackball Scroll-Mode placeholder
-#define SCRL_MOD KC_NO
+// Trackball mode aliases used in the layout below.
+#define SCRL_MOD TB_L_SMRT
+#define CPI_UP   TB_L_BRI
+#define CPI_DOWN TB_L_VOL
+#define CPI_DFLT TB_L_PAN
 
 enum layers {
     _BASE,
@@ -31,6 +29,24 @@ enum custom_keycodes {
     STAT_BRID,
     STAT_BRIU,
     STAT_TEST,
+
+    TB_BASE,
+    TB_L_SMRT,
+    TB_R_SMRT,
+    TB_L_VSCR,
+    TB_R_VSCR,
+    TB_L_HSCR,
+    TB_R_HSCR,
+    TB_L_PAN,
+    TB_R_PAN,
+    TB_L_VOL,
+    TB_R_VOL,
+    TB_L_BRI,
+    TB_R_BRI,
+    TB_L_ZOOM,
+    TB_R_ZOOM,
+    TB_L_ROT,
+    TB_R_ROT,
 };
 
 enum status_error_code {
@@ -38,6 +54,41 @@ enum status_error_code {
     STATUS_ERROR_SPLIT,
     STATUS_ERROR_POINTING,
 };
+
+enum trackball_side {
+    TB_SIDE_LEFT,
+    TB_SIDE_RIGHT,
+};
+
+enum trackball_mode {
+    TB_MODE_CURSOR,
+    TB_MODE_SMART_SCROLL,
+    TB_MODE_VSCROLL,
+    TB_MODE_HSCROLL,
+    TB_MODE_PAN,
+    TB_MODE_VOLUME,
+    TB_MODE_BRIGHTNESS,
+    TB_MODE_ZOOM,
+    TB_MODE_ROTATE,
+};
+
+enum trackball_axis_lock {
+    TB_AXIS_NONE,
+    TB_AXIS_VERTICAL,
+    TB_AXIS_HORIZONTAL,
+};
+
+typedef struct {
+    enum trackball_mode      held_mode;
+    enum trackball_mode      latched_mode;
+    enum trackball_axis_lock axis_lock;
+    uint32_t                 key_timer;
+    uint32_t                 activity_timer;
+    int16_t                  v_accum;
+    int16_t                  h_accum;
+    int16_t                  key_accum;
+    bool                     moved_while_held;
+} trackball_state_t;
 
 typedef struct {
     uint8_t h;
@@ -64,6 +115,13 @@ typedef struct {
 #define STATUS_BREATHE_MS 2000
 #define STATUS_LAYER_ALTERNATE_MS 700
 #define STATUS_BREATHE_MIN 8
+#define TB_MODE_TIMEOUT_MS 1200
+#define TB_AXIS_TIMEOUT_MS 600
+#define TB_AXIS_LOCK_THRESHOLD 4
+#define TB_AXIS_LOCK_RATIO 2
+#define TB_SCROLL_DIVISOR 8
+#define TB_KEY_THRESHOLD 24
+#define TB_ROTATE_THRESHOLD 32
 
 static bool     status_enabled          = true;
 static uint8_t  status_brightness       = 64;
@@ -73,6 +131,13 @@ static uint32_t status_error_check_timer = 0;
 static uint8_t  status_error_code       = STATUS_ERROR_NONE;
 
 static status_hsv_t status_last_hsv = {HSV_OFF};
+
+static trackball_state_t trackball_states[] __attribute__((unused)) = {
+    [TB_SIDE_LEFT]  = {0},
+    [TB_SIDE_RIGHT] = {0},
+};
+
+static void status_render(void);
 
 static const status_layer_style_t status_layer_styles[] = {
     [_BASE] = {{HSV_WHITE}, {HSV_WHITE}, false},
