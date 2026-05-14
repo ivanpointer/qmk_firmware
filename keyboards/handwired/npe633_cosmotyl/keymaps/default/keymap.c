@@ -132,7 +132,7 @@ static uint8_t  status_error_code       = STATUS_ERROR_NONE;
 
 static status_hsv_t status_last_hsv = {HSV_OFF};
 
-static trackball_state_t trackball_states[] __attribute__((unused)) = {
+static trackball_state_t trackball_states[] = {
     [TB_SIDE_LEFT]  = {0},
     [TB_SIDE_RIGHT] = {0},
 };
@@ -163,7 +163,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_SH2] = LAYOUT(
-        KC_TRNS  , KC_7     , KC_5     , KC_3     , KC_1     , KC_9     , TO(_BASE)    ,                       TO(_BASE), KC_0     , KC_2     , KC_4     , KC_6     , KC_8     , KC_TRNS,
+        KC_TRNS  , KC_7     , KC_5     , KC_3     , KC_1     , KC_9     , TB_BASE     ,                       TB_BASE , KC_0     , KC_2     , KC_4     , KC_6     , KC_8     , KC_TRNS,
         KC_TRNS  , KC_LT    , KC_GT    , KC_DLR   , KC_AMPR  , KC_MINS  , KC_TRNS  ,                       KC_NO    , KC_SLSH  , KC_BSLS  , KC_AT    , KC_HASH  , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_LBRC  , KC_LCBR  , KC_RCBR  , KC_LPRN  , KC_EQL   , KC_NO    ,                       KC_NO    , KC_ASTR  , KC_RPRN  , KC_PLUS  , KC_RBRC  , KC_EXLM  , KC_TRNS,
         KC_TRNS  , KC_QUOT  , KC_NO    , KC_NO    , KC_TILD  , KC_PERC  , KC_NO    ,                       KC_NO    , KC_UNDS  , KC_QUES  , KC_PIPE  , KC_CIRC  , KC_GRV   , KC_TRNS,
@@ -174,7 +174,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_MOU] = LAYOUT(
-        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , TO(_BASE),                       TO(_BASE), KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
+        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , TB_BASE ,                       TB_BASE , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS  ,                       KC_NO    , CPI_UP   , MBCK     , KC_NO    , MFWD     , MS_WHLU  , KC_TRNS,
         KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    ,                       KC_NO    , CPI_DOWN , LCLK     , RCLK     , MCLK     , MS_WHLD  , KC_TRNS,
         KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    ,                       SCRL_MOD , CPI_DFLT , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
@@ -185,7 +185,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_NAV] = LAYOUT(
-        KC_TRNS   , KC_NO     , KC_NO     , KC_NO     , KC_NO     , KC_NO     , TO(_BASE)     ,                         TO(_BASE) , KC_NO     , KC_NO     , KC_NO     , KC_NO     , KC_NO     , KC_TRNS,
+        KC_TRNS   , KC_NO     , KC_NO     , KC_NO     , KC_NO     , KC_NO     , TB_BASE      ,                         TB_BASE  , KC_NO     , KC_NO     , KC_NO     , KC_NO     , KC_NO     , KC_TRNS,
         KC_CAPS   , KC_NO     , KC_NO     , KC_NO     , KC_NO     , KC_NO     , KC_TRNS   ,                         KC_NO     , KC_PGUP   , MBCK      , KC_UP     , MFWD      , KC_NO     , KC_TRNS,
         KC_TRNS   , KC_LSFT   , KC_LCTL   , KC_LALT   , KC_LGUI   , KC_NO     , KC_NO     ,                         KC_NO     , KC_PGDN   , KC_LEFT   , KC_DOWN   , KC_RGHT   , KC_NO     , KC_TRNS,
         KC_TRNS   , KC_NO     , LGUI(KC_X), LGUI(KC_C), LGUI(KC_V), KC_NO     , KC_NO     ,                         KC_NO     , KC_NO     , KC_HOME   , KC_NO     , KC_END    , KC_NO     , KC_TRNS,
@@ -196,7 +196,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_NUM] = LAYOUT(
-        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , TO(_BASE)    ,                       TO(_BASE), KC_NUM   , KC_PSLS  , KC_PAST  , KC_PMNS  , KC_NO    , KC_TRNS,
+        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , TB_BASE     ,                       TB_BASE , KC_NUM   , KC_PSLS  , KC_PAST  , KC_PMNS  , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS  ,                       KC_NO    , KC_P7    , KC_P8    , KC_P9    , KC_PPLS  , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_LSFT  , KC_LCTL  , KC_LALT  , KC_LGUI  , KC_NO    , KC_NO    ,                       KC_NO    , KC_P4    , KC_P5    , KC_P6    , KC_PENT  , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    ,                       KC_NO    , KC_P1    , KC_P2    , KC_P3    , KC_PDOT  , KC_NO    , KC_TRNS,
@@ -207,7 +207,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_FN1] = LAYOUT(
-        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , TO(_BASE)    ,                       TO(_BASE), KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
+        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , TB_BASE     ,                       TB_BASE , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_F1    , KC_F2    , KC_F3    , KC_F4    , KC_NO    , KC_TRNS  ,                       KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_F5    , KC_F6    , KC_F7    , KC_F8    , KC_NO    , KC_NO    ,                       TT(_FN2) , KC_NO    , KC_RGUI  , KC_RALT  , KC_RCTL  , KC_RSFT  , KC_TRNS,
         KC_TRNS  , KC_F9    , KC_F10   , KC_F11   , KC_F12   , KC_NO    , KC_NO    ,                       KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
@@ -218,7 +218,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_FN2] = LAYOUT(
-        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , TO(_BASE)    ,                       TO(_BASE), KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
+        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , TB_BASE     ,                       TB_BASE , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_F13   , KC_F14   , KC_F15   , KC_F16   , KC_NO    , KC_TRNS  ,                       KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_F17   , KC_F18   , KC_F19   , KC_F20   , KC_NO    , KC_NO    ,                       KC_NO    , KC_NO    , KC_RGUI  , KC_RALT  , KC_RCTL  , KC_RSFT  , KC_TRNS,
         KC_TRNS  , KC_F21   , KC_F22   , KC_F23   , KC_F24   , KC_NO    , KC_NO    ,                       KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
@@ -229,7 +229,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_SYS] = LAYOUT(
-        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , TO(_BASE)    ,                       TO(_BASE), KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
+        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , TB_BASE     ,                       TB_BASE , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS  ,                       KC_NO    , KC_VOLU  , KC_MPRV  , KC_MSTP  , KC_MNXT  , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_LSFT  , KC_LCTL  , KC_LALT  , KC_LGUI  , KC_NO    , KC_NO    ,                       KC_NO    , KC_VOLD  , KC_NO    , KC_MPLY  , KC_NO    , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    ,                       KC_NO    , KC_MUTE  , STAT_BRID, STAT_TEST, STAT_BRIU, STAT_TOGG, KC_TRNS,
@@ -291,6 +291,46 @@ static report_mouse_t rotate_left_pointing_report(report_mouse_t report) {
     report.y = status_clamp_mouse_xy(((x + y) * LEFT_POINTING_ROTATION_SCALE) >> LEFT_POINTING_ROTATION_SHIFT);
 
     return report;
+}
+
+static trackball_state_t *trackball_state_for_side(enum trackball_side side) {
+    return &trackball_states[side];
+}
+
+static enum trackball_mode trackball_effective_mode(enum trackball_side side) __attribute__((unused));
+static enum trackball_mode trackball_effective_mode(enum trackball_side side) {
+    trackball_state_t *state = trackball_state_for_side(side);
+
+    if (state->held_mode != TB_MODE_CURSOR) {
+        return state->held_mode;
+    }
+
+    return state->latched_mode;
+}
+
+static void trackball_clear_side(enum trackball_side side) {
+    trackball_state_t *state = trackball_state_for_side(side);
+
+    state->held_mode        = TB_MODE_CURSOR;
+    state->latched_mode     = TB_MODE_CURSOR;
+    state->axis_lock        = TB_AXIS_NONE;
+    state->key_timer        = 0;
+    state->activity_timer   = 0;
+    state->v_accum          = 0;
+    state->h_accum          = 0;
+    state->key_accum        = 0;
+    state->moved_while_held = false;
+}
+
+static void trackball_clear_all(void) {
+    trackball_clear_side(TB_SIDE_LEFT);
+    trackball_clear_side(TB_SIDE_RIGHT);
+}
+
+static void reset_keyboard_state_to_base(void) {
+    trackball_clear_all();
+    layer_clear();
+    status_render();
 }
 
 report_mouse_t pointing_device_task_combined_user(report_mouse_t left_report, report_mouse_t right_report) {
@@ -425,6 +465,7 @@ void keyboard_post_init_user(void) {
     status_error_timer       = status_startup_timer;
     status_error_check_timer = status_startup_timer;
     status_last_hsv          = (status_hsv_t){HSV_OFF};
+    trackball_clear_all();
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
@@ -448,6 +489,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 
     switch (keycode) {
+        case TB_BASE:
+            reset_keyboard_state_to_base();
+            return false;
+
         case STAT_TOGG:
             status_enabled = !status_enabled;
             status_render();
