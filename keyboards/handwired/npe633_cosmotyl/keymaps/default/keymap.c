@@ -479,11 +479,141 @@ bool led_update_user(led_t led_state) {
     return true;
 }
 
+static void trackball_timeout_task(void) {
+    for (uint8_t side = 0; side < ARRAY_SIZE(trackball_states); side++) {
+        trackball_state_t *state = &trackball_states[side];
+
+        if (state->latched_mode != TB_MODE_CURSOR && state->activity_timer != 0 && timer_elapsed32(state->activity_timer) > TB_MODE_TIMEOUT_MS) {
+            trackball_clear_side(side);
+        } else if (state->axis_lock != TB_AXIS_NONE && state->activity_timer != 0 && timer_elapsed32(state->activity_timer) > TB_AXIS_TIMEOUT_MS) {
+            state->axis_lock = TB_AXIS_NONE;
+            state->v_accum   = 0;
+            state->h_accum   = 0;
+            state->key_accum = 0;
+        }
+    }
+}
+
 void housekeeping_task_user(void) {
+    trackball_timeout_task();
     status_render();
 }
 
+static bool trackball_keycode_to_mode(uint16_t keycode, enum trackball_side *side, enum trackball_mode *mode) {
+    switch (keycode) {
+        case TB_L_SMRT:
+            *side = TB_SIDE_LEFT;
+            *mode = TB_MODE_SMART_SCROLL;
+            return true;
+        case TB_R_SMRT:
+            *side = TB_SIDE_RIGHT;
+            *mode = TB_MODE_SMART_SCROLL;
+            return true;
+        case TB_L_VSCR:
+            *side = TB_SIDE_LEFT;
+            *mode = TB_MODE_VSCROLL;
+            return true;
+        case TB_R_VSCR:
+            *side = TB_SIDE_RIGHT;
+            *mode = TB_MODE_VSCROLL;
+            return true;
+        case TB_L_HSCR:
+            *side = TB_SIDE_LEFT;
+            *mode = TB_MODE_HSCROLL;
+            return true;
+        case TB_R_HSCR:
+            *side = TB_SIDE_RIGHT;
+            *mode = TB_MODE_HSCROLL;
+            return true;
+        case TB_L_PAN:
+            *side = TB_SIDE_LEFT;
+            *mode = TB_MODE_PAN;
+            return true;
+        case TB_R_PAN:
+            *side = TB_SIDE_RIGHT;
+            *mode = TB_MODE_PAN;
+            return true;
+        case TB_L_VOL:
+            *side = TB_SIDE_LEFT;
+            *mode = TB_MODE_VOLUME;
+            return true;
+        case TB_R_VOL:
+            *side = TB_SIDE_RIGHT;
+            *mode = TB_MODE_VOLUME;
+            return true;
+        case TB_L_BRI:
+            *side = TB_SIDE_LEFT;
+            *mode = TB_MODE_BRIGHTNESS;
+            return true;
+        case TB_R_BRI:
+            *side = TB_SIDE_RIGHT;
+            *mode = TB_MODE_BRIGHTNESS;
+            return true;
+        case TB_L_ZOOM:
+            *side = TB_SIDE_LEFT;
+            *mode = TB_MODE_ZOOM;
+            return true;
+        case TB_R_ZOOM:
+            *side = TB_SIDE_RIGHT;
+            *mode = TB_MODE_ZOOM;
+            return true;
+        case TB_L_ROT:
+            *side = TB_SIDE_LEFT;
+            *mode = TB_MODE_ROTATE;
+            return true;
+        case TB_R_ROT:
+            *side = TB_SIDE_RIGHT;
+            *mode = TB_MODE_ROTATE;
+            return true;
+    }
+
+    return false;
+}
+
+static void trackball_mode_key_pressed(enum trackball_side side, enum trackball_mode mode) {
+    trackball_state_t *state = trackball_state_for_side(side);
+
+    state->held_mode        = mode;
+    state->key_timer        = timer_read32();
+    state->activity_timer   = state->key_timer;
+    state->axis_lock        = TB_AXIS_NONE;
+    state->moved_while_held = false;
+    state->v_accum          = 0;
+    state->h_accum          = 0;
+    state->key_accum        = 0;
+}
+
+static void trackball_mode_key_released(enum trackball_side side) {
+    trackball_state_t *state = trackball_state_for_side(side);
+
+    if (!state->moved_while_held && timer_elapsed32(state->key_timer) <= TAPPING_TERM && state->held_mode != TB_MODE_CURSOR) {
+        state->latched_mode   = state->held_mode;
+        state->activity_timer = timer_read32();
+    }
+
+    state->held_mode        = TB_MODE_CURSOR;
+    state->axis_lock        = TB_AXIS_NONE;
+    state->moved_while_held = false;
+    state->v_accum          = 0;
+    state->h_accum          = 0;
+    state->key_accum        = 0;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    enum trackball_side side;
+    enum trackball_mode mode;
+
+    if (trackball_keycode_to_mode(keycode, &side, &mode)) {
+        if (record->event.pressed) {
+            trackball_mode_key_pressed(side, mode);
+        } else {
+            trackball_mode_key_released(side);
+        }
+
+        status_render();
+        return false;
+    }
+
     if (!record->event.pressed) {
         return true;
     }
