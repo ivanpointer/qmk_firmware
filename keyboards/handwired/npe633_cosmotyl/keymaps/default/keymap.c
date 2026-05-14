@@ -333,8 +333,169 @@ static void reset_keyboard_state_to_base(void) {
     status_render();
 }
 
+static int16_t trackball_abs16(int16_t value) {
+    return value < 0 ? -value : value;
+}
+
+static bool trackball_report_has_motion(report_mouse_t report) {
+    return report.x != 0 || report.y != 0;
+}
+
+static void trackball_mark_activity(enum trackball_side side) {
+    trackball_state_t *state = trackball_state_for_side(side);
+
+    state->activity_timer = timer_read32();
+
+    if (state->held_mode != TB_MODE_CURSOR) {
+        state->moved_while_held = true;
+    }
+}
+
+static enum trackball_axis_lock trackball_choose_axis(report_mouse_t report) {
+    int16_t abs_x = trackball_abs16(report.x);
+    int16_t abs_y = trackball_abs16(report.y);
+
+    if (abs_y >= TB_AXIS_LOCK_THRESHOLD && abs_y >= abs_x * TB_AXIS_LOCK_RATIO) {
+        return TB_AXIS_VERTICAL;
+    }
+
+    if (abs_x >= TB_AXIS_LOCK_THRESHOLD && abs_x >= abs_y * TB_AXIS_LOCK_RATIO) {
+        return TB_AXIS_HORIZONTAL;
+    }
+
+    return TB_AXIS_NONE;
+}
+
+static mouse_hv_report_t trackball_scroll_value(int16_t *accum, int16_t delta) {
+    mouse_hv_report_t output = 0;
+
+    *accum += delta;
+
+    while (*accum >= TB_SCROLL_DIVISOR) {
+        output++;
+        *accum -= TB_SCROLL_DIVISOR;
+    }
+
+    while (*accum <= -TB_SCROLL_DIVISOR) {
+        output--;
+        *accum += TB_SCROLL_DIVISOR;
+    }
+
+    return output;
+}
+
+static void trackball_tap_by_accum(int16_t *accum, int16_t delta, uint16_t positive_keycode, uint16_t negative_keycode) {
+    *accum += delta;
+
+    while (*accum >= TB_KEY_THRESHOLD) {
+        tap_code16(positive_keycode);
+        *accum -= TB_KEY_THRESHOLD;
+    }
+
+    while (*accum <= -TB_KEY_THRESHOLD) {
+        tap_code16(negative_keycode);
+        *accum += TB_KEY_THRESHOLD;
+    }
+}
+
+static void trackball_tap_rotate(int16_t *accum, int16_t delta) {
+    *accum += delta;
+
+    while (*accum >= TB_ROTATE_THRESHOLD) {
+        tap_code16(LALT(KC_RBRC));
+        *accum -= TB_ROTATE_THRESHOLD;
+    }
+
+    while (*accum <= -TB_ROTATE_THRESHOLD) {
+        tap_code16(LALT(KC_LBRC));
+        *accum += TB_ROTATE_THRESHOLD;
+    }
+}
+
+static report_mouse_t trackball_process_side(enum trackball_side side, report_mouse_t report) {
+    enum trackball_mode mode  = trackball_effective_mode(side);
+    trackball_state_t  *state = trackball_state_for_side(side);
+
+    if (mode == TB_MODE_CURSOR || !trackball_report_has_motion(report)) {
+        return report;
+    }
+
+    trackball_mark_activity(side);
+
+    switch (mode) {
+        case TB_MODE_SMART_SCROLL:
+            if (state->axis_lock == TB_AXIS_NONE) {
+                state->axis_lock = trackball_choose_axis(report);
+            }
+
+            if (state->axis_lock == TB_AXIS_VERTICAL) {
+                report.v = trackball_scroll_value(&state->v_accum, -report.y);
+                report.x = 0;
+                report.y = 0;
+            } else if (state->axis_lock == TB_AXIS_HORIZONTAL) {
+                report.h = trackball_scroll_value(&state->h_accum, report.x);
+                report.x = 0;
+                report.y = 0;
+            } else {
+                report.x = 0;
+                report.y = 0;
+            }
+            break;
+
+        case TB_MODE_VSCROLL:
+            report.v = trackball_scroll_value(&state->v_accum, -report.y);
+            report.x = 0;
+            report.y = 0;
+            break;
+
+        case TB_MODE_HSCROLL:
+            report.h = trackball_scroll_value(&state->h_accum, report.x);
+            report.x = 0;
+            report.y = 0;
+            break;
+
+        case TB_MODE_PAN:
+            report.h = trackball_scroll_value(&state->h_accum, report.x);
+            report.v = trackball_scroll_value(&state->v_accum, -report.y);
+            report.x = 0;
+            report.y = 0;
+            break;
+
+        case TB_MODE_VOLUME:
+            trackball_tap_by_accum(&state->key_accum, -report.y, KC_VOLU, KC_VOLD);
+            report.x = 0;
+            report.y = 0;
+            break;
+
+        case TB_MODE_BRIGHTNESS:
+            trackball_tap_by_accum(&state->key_accum, -report.y, KC_BRIU, KC_BRID);
+            report.x = 0;
+            report.y = 0;
+            break;
+
+        case TB_MODE_ZOOM:
+            trackball_tap_by_accum(&state->key_accum, -report.y, LGUI(KC_EQUAL), LGUI(KC_MINUS));
+            report.x = 0;
+            report.y = 0;
+            break;
+
+        case TB_MODE_ROTATE:
+            trackball_tap_rotate(&state->key_accum, report.x);
+            report.x = 0;
+            report.y = 0;
+            break;
+
+        case TB_MODE_CURSOR:
+            break;
+    }
+
+    return report;
+}
+
 report_mouse_t pointing_device_task_combined_user(report_mouse_t left_report, report_mouse_t right_report) {
-    left_report = rotate_left_pointing_report(left_report);
+    left_report  = rotate_left_pointing_report(left_report);
+    left_report  = trackball_process_side(TB_SIDE_LEFT, left_report);
+    right_report = trackball_process_side(TB_SIDE_RIGHT, right_report);
 
     return pointing_device_combine_reports(left_report, right_report);
 }
