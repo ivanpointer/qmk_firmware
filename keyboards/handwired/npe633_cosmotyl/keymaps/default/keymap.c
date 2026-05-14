@@ -12,6 +12,10 @@
 #define CPI_UP   TB_L_BRI
 #define CPI_DOWN TB_L_VOL
 #define CPI_DFLT TB_L_PAN
+#define TB_L_ZOOM_KEY TB_L_ZOOM
+#define TB_L_ROT_KEY  TB_L_ROT
+#define TB_R_SMRT_KEY TB_R_SMRT
+#define TB_R_PAN_KEY  TB_R_PAN
 
 enum layers {
     _BASE,
@@ -177,7 +181,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , TB_BASE ,                       TB_BASE , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
         KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS  ,                       KC_NO    , CPI_UP   , MBCK     , KC_NO    , MFWD     , MS_WHLU  , KC_TRNS,
         KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    ,                       KC_NO    , CPI_DOWN , LCLK     , RCLK     , MCLK     , MS_WHLD  , KC_TRNS,
-        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    ,                       SCRL_MOD , CPI_DFLT , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_TRNS,
+        KC_TRNS  , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    , KC_NO    ,                       SCRL_MOD , CPI_DFLT , TB_L_ZOOM_KEY, TB_L_ROT_KEY, TB_R_SMRT_KEY, TB_R_PAN_KEY, KC_TRNS,
                               KC_TRNS  , KC_TRNS  , KC_TRNS  ,                                                                   KC_TRNS  , KC_TRNS  , KC_TRNS,
                                                     KC_TRNS  ,                                                                   KC_TRNS,
                                                                KC_TRNS  ,                                             KC_TRNS,
