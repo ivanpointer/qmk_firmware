@@ -106,6 +106,16 @@ typedef struct {
     bool         alternate;
 } status_layer_style_t;
 
+typedef struct {
+    uint8_t             error_code;
+    uint8_t             active_layer;
+    bool                startup_active;
+    bool                caps_lock;
+    bool                num_lock;
+    enum trackball_mode left_mode;
+    enum trackball_mode right_mode;
+} status_model_t;
+
 #define STATUS_BRIGHTNESS_STEP 16
 #define STATUS_BRIGHTNESS_MIN 16
 #define STATUS_BRIGHTNESS_MAX 96
@@ -518,16 +528,6 @@ static uint8_t status_wave_value(uint32_t now, uint16_t period, uint8_t min_valu
     return min_value + ((uint32_t)travel * phase / half_cycle);
 }
 
-static status_layer_style_t status_style_for_active_layer(void) {
-    uint8_t layer = get_highest_layer(layer_state | default_layer_state);
-
-    if (layer >= ARRAY_SIZE(status_layer_styles)) {
-        layer = _BASE;
-    }
-
-    return status_layer_styles[layer];
-}
-
 static void status_set_hsv(status_hsv_t color) {
     if (color.h == status_last_hsv.h && color.s == status_last_hsv.s && color.v == status_last_hsv.v) {
         return;
@@ -583,15 +583,64 @@ static void status_render_error(void) {
     status_set_hsv(on ? (status_hsv_t){HSV_RED} : (status_hsv_t){HSV_OFF});
 }
 
-static void status_render_normal(uint32_t now) {
-    status_layer_style_t style = status_style_for_active_layer();
+static status_model_t status_collect_model(uint32_t now) {
+    led_t   led_state = host_keyboard_led_state();
+    uint8_t layer     = get_highest_layer(layer_state | default_layer_state);
+
+    if (layer >= ARRAY_SIZE(status_layer_styles)) {
+        layer = _BASE;
+    }
+
+    return (status_model_t){
+        .error_code     = status_error_code,
+        .active_layer   = layer,
+        .startup_active = timer_elapsed32(status_startup_timer) < STATUS_STARTUP_MS,
+        .caps_lock      = led_state.caps_lock,
+        .num_lock       = led_state.num_lock,
+        .left_mode      = trackball_effective_mode(TB_SIDE_LEFT),
+        .right_mode     = trackball_effective_mode(TB_SIDE_RIGHT),
+    };
+}
+
+static status_hsv_t status_color_for_trackball_mode(enum trackball_mode mode) {
+    switch (mode) {
+        case TB_MODE_SMART_SCROLL:
+        case TB_MODE_VSCROLL:
+        case TB_MODE_HSCROLL:
+        case TB_MODE_PAN:
+            return (status_hsv_t){HSV_CYAN};
+        case TB_MODE_VOLUME:
+            return (status_hsv_t){HSV_GREEN};
+        case TB_MODE_BRIGHTNESS:
+            return (status_hsv_t){HSV_YELLOW};
+        case TB_MODE_ZOOM:
+            return (status_hsv_t){HSV_BLUE};
+        case TB_MODE_ROTATE:
+            return (status_hsv_t){HSV_PURPLE};
+        case TB_MODE_CURSOR:
+            return (status_hsv_t){HSV_OFF};
+    }
+
+    return (status_hsv_t){HSV_OFF};
+}
+
+static void status_render_normal(uint32_t now, status_model_t model) {
+    status_layer_style_t style = status_layer_styles[model.active_layer];
     status_hsv_t         color = style.primary;
 
-    if (style.alternate && ((now / STATUS_LAYER_ALTERNATE_MS) % 2) == 1) {
+    if (model.left_mode != TB_MODE_CURSOR) {
+        color = status_color_for_trackball_mode(model.left_mode);
+    } else if (model.right_mode != TB_MODE_CURSOR) {
+        color = status_color_for_trackball_mode(model.right_mode);
+    } else if (style.alternate && ((now / STATUS_LAYER_ALTERNATE_MS) % 2) == 1) {
         color = style.secondary;
     }
 
-    if (host_keyboard_led_state().caps_lock) {
+    if (model.num_lock && model.left_mode == TB_MODE_CURSOR && model.right_mode == TB_MODE_CURSOR && ((now / STATUS_LAYER_ALTERNATE_MS) % 2) == 1) {
+        color = (status_hsv_t){HSV_WHITE};
+    }
+
+    if (model.caps_lock) {
         color.v = status_wave_value(now, STATUS_BREATHE_MS, STATUS_BREATHE_MIN);
     } else {
         color.v = status_brightness;
@@ -608,7 +657,9 @@ static void status_render(void) {
         return;
     }
 
-    if (timer_elapsed32(status_startup_timer) < STATUS_STARTUP_MS) {
+    status_model_t model = status_collect_model(now);
+
+    if (model.startup_active) {
         status_render_startup();
         return;
     }
@@ -620,7 +671,7 @@ static void status_render(void) {
         return;
     }
 
-    status_render_normal(now);
+    status_render_normal(now, model);
 }
 
 void keyboard_post_init_user(void) {
