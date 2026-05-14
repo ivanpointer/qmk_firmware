@@ -204,6 +204,37 @@ const key_override_t *key_overrides[] = {
     NULL,
 };
 
+#ifdef POINTING_DEVICE_ENABLE
+#    define LEFT_POINTING_ROTATION_SCALE 181
+#    define LEFT_POINTING_ROTATION_SHIFT 8
+
+static mouse_xy_report_t status_clamp_mouse_xy(int32_t value) {
+    if (value < MOUSE_REPORT_XY_MIN) {
+        return MOUSE_REPORT_XY_MIN;
+    } else if (value > MOUSE_REPORT_XY_MAX) {
+        return MOUSE_REPORT_XY_MAX;
+    }
+
+    return value;
+}
+
+static report_mouse_t rotate_left_pointing_report(report_mouse_t report) {
+    int32_t x = report.x;
+    int32_t y = report.y;
+
+    report.x = status_clamp_mouse_xy(((x - y) * LEFT_POINTING_ROTATION_SCALE) >> LEFT_POINTING_ROTATION_SHIFT);
+    report.y = status_clamp_mouse_xy(((x + y) * LEFT_POINTING_ROTATION_SCALE) >> LEFT_POINTING_ROTATION_SHIFT);
+
+    return report;
+}
+
+report_mouse_t pointing_device_task_combined_user(report_mouse_t left_report, report_mouse_t right_report) {
+    left_report = rotate_left_pointing_report(left_report);
+
+    return pointing_device_combine_reports(left_report, right_report);
+}
+#endif
+
 static uint8_t status_wave_value(uint32_t now, uint16_t period, uint8_t min_value) {
     const uint16_t half_cycle = period / 2;
     uint16_t       phase      = now % period;

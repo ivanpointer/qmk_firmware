@@ -20,8 +20,9 @@
 #define PMW33XX_SPI_DIVISOR 256
 // #define POINTING_DEVICE_CS_PIN GP5
 #define PMW33XX_CS_PIN GP5
-// #define ROTATIONAL_TRANSFORM_ANGLE -30 // Optional: Rotates the trackball
-// #define POINTING_DEVICE_INVERT_X // Optional: Inverts trackball X
+#define ROTATIONAL_TRANSFORM_ANGLE -75 // Rotates the trackball sensor data into keyboard orientation
+#define POINTING_DEVICE_INVERT_X // Inverts trackball X
+#define POINTING_DEVICE_INVERT_X_RIGHT // Inverts right trackball X
 #define SPLIT_POINTING_ENABLE
 #define POINTING_DEVICE_COMBINED
 
