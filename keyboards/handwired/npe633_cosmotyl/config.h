@@ -28,6 +28,7 @@
 #define POINTING_DEVICE_COMBINED
 
 /* Reset */
-#define RP2040_BOOTLOADER_DOUBLE_TAP_RESET
-#define RP2040_BOOTLOADER_DOUBLE_TAP_RESET_LED GP25
-// This LED blinks when entering bootloader
+// Keep bootloader entry behind the explicit STAT_BOOT key path.
+// Double-tap reset can be confused by hosts that repeatedly reset or reject USB.
+// #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET
+// #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET_LED GP25

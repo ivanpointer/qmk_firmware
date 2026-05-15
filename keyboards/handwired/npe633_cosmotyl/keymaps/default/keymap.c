@@ -838,6 +838,10 @@ static void status_apply_all(status_hsv_t color) {
     status_apply_both_frames(frame, frame);
 }
 
+static bool status_usb_ready_for_frames(void) {
+    return usb_device_state_get_configure_state() == USB_DEVICE_STATE_CONFIGURED;
+}
+
 static void status_update_error_code(uint32_t now) {
     if (timer_elapsed32(status_error_check_timer) < STATUS_ERROR_CHECK_MS) {
         return;
@@ -1116,6 +1120,10 @@ static void status_render(void) {
         return;
     }
 
+    if (!status_usb_ready_for_frames() && !status_suspended) {
+        return;
+    }
+
     uint32_t now = timer_read32();
 
     if (!status_enabled) {
@@ -1151,7 +1159,6 @@ void keyboard_post_init_user(void) {
     status_remote_refresh_timer = status_startup_timer;
     status_initialized       = true;
     trackball_clear_all();
-    status_render();
 }
 
 void notify_usb_device_state_change_user(struct usb_device_state usb_state) {
