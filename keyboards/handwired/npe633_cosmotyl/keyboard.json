@@ -16,10 +16,10 @@
         }
     },
     "rgblight": {
-        "led_count": 2,
+        "led_count": 8,
         "max_brightness": 96,
         "split": true,
-        "split_count": [1, 1],
+        "split_count": [4, 4],
         "default": {
             "on": true,
             "val": 64
