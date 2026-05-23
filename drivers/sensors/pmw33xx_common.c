@@ -236,6 +236,11 @@ pmw33xx_report_t pmw33xx_read_burst(uint8_t sensor) {
     return report;
 }
 
+__attribute__((weak)) void pmw33xx_report_user(uint8_t sensor, pmw33xx_report_t report) {
+    (void)sensor;
+    (void)report;
+}
+
 bool pmw33xx_init_wrapper(void) {
     return pmw33xx_init(0);
 }
@@ -251,6 +256,8 @@ uint16_t pmw33xx_get_cpi_wrapper(void) {
 report_mouse_t pmw33xx_get_report(report_mouse_t mouse_report) {
     pmw33xx_report_t report    = pmw33xx_read_burst(0);
     static bool      in_motion = false;
+
+    pmw33xx_report_user(0, report);
 
     if (report.motion.b.is_lifted) {
         return mouse_report;

@@ -2,6 +2,8 @@
 
 Each half has a four-LED RGBLight status string on GP23. The LEDs are intended to feed four separate fiber strands.
 
+See `docs/companion-raw-hid.md` for the Raw HID companion protocol that reports the same logical layer, lock, pointing, split, and lift state to a host application.
+
 ## Normal Roles
 
 | Light | Role | Behavior |
@@ -15,6 +17,8 @@ The master half renders both halves and sends the remote half's four-light frame
 
 ## Board Status And Locks
 
+Caps Lock, Num Lock, and Scroll Lock are host lock state, not companion-app state. The firmware listens to QMK's standard host LED update path through `led_update_user()`, so lock changes made by another keyboard on the same host should be reflected on the NPE633 status light without the companion app running.
+
 | State | Indicator |
 | --- | --- |
 | No lock / no error | Light 4 is white |
@@ -27,6 +31,10 @@ The master half renders both halves and sends the remote half's four-light frame
 | Num Lock | Light 4 is orange |
 | Scroll Lock | Light 4 is cyan |
 | Multiple locks | Light 4 rotates through the active lock colors |
+
+On cold boot, status frames stay quiet until USB configures or the firmware receives a suspend callback. After the keyboard has configured at least once, later KVM-induced deconfigure/reset states are rendered as the no-host pattern instead of leaving stale LEDs on either half.
+
+On the USB/master half only, if USB has configured once and later remains unconfigured for 8 seconds, the firmware restarts the USB device driver to prompt host re-enumeration. Retries are rate-limited to 20 seconds. Split transport loss is deliberately ignored by this recovery path, so a single working half is not treated as a bad state.
 
 Error codes repeat until the error clears. Only the main status light is taken over by the error code; layer, trackball mode, and pointing status continue to render on their dedicated lights.
 
@@ -84,7 +92,7 @@ When adjusting scroll speed or CPI, all four lights temporarily show the selecte
 | 6 | Lights 3 and 4 |
 | 7 | Light 4 |
 
-Level 4 is the default middle level for both scroll speed and CPI.
+Level 4 is the default middle level for both scroll speed and CPI. The flashed default CPI ladder is 500, 750, 1000, 2000, 3000, 5000, and 8000. The flashed default scroll divisor ladder is 192, 128, 96, 64, 40, 24, and 12, where lower divisors scroll faster. The Raw HID companion API can persist and reset per-level CPI and scroll overrides independently in EEPROM. Scroll-like modes use a fixed firmware CPI while active so cursor DPI changes do not change scroll speed.
 
 ## Console
 

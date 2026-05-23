@@ -155,6 +155,15 @@ void pmw33xx_set_cpi_all_sensors(uint16_t cpi);
 pmw33xx_report_t pmw33xx_read_burst(uint8_t sensor);
 
 /**
+ * @brief User hook for observing raw PMW33XX motion-burst data before the
+ * driver converts it to a host mouse report.
+ *
+ * @param sensor Index of the sensor chip select pin
+ * @param report Raw motion-burst report read from the sensor
+ */
+void pmw33xx_report_user(uint8_t sensor, pmw33xx_report_t report);
+
+/**
  * @brief Read one byte of data from the given register on the sensor
  *
  * @param sensor Index of the sensors chip select pin
