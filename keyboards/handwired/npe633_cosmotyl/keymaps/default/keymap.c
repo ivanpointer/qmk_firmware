@@ -28,6 +28,8 @@
 #define TB_L_ROT_KEY  TB_L_ROT
 #define TB_R_SMRT_KEY TB_R_SMRT
 #define TB_R_PAN_KEY  TB_R_PAN
+#define GAME_TOG TG(_GAME)
+#define TO_BASE  TO(_BASE)
 
 enum layers {
     _BASE,
@@ -38,6 +40,7 @@ enum layers {
     _FN1,
     _FN2,
     _SYS,
+    _GAME,
     _LAYER_COUNT
 };
 
@@ -466,6 +469,7 @@ static const status_layer_style_t status_layer_styles[] = {
     [_FN1]  = {{HSV_PURPLE}, {HSV_PURPLE}, false, STATUS_LAYER_BRIGHTNESS_FULL},
     [_FN2]  = {{HSV_PURPLE}, {HSV_CYAN}, true, STATUS_LAYER_BRIGHTNESS_FULL},
     [_SYS]  = {{HSV_PURPLE}, {HSV_YELLOW}, true, STATUS_LAYER_BRIGHTNESS_FULL},
+    [_GAME] = {{HSV_RED}, {HSV_ORANGE}, true, STATUS_LAYER_BRIGHTNESS_FULL},
 };
 
 static const char companion_layer_aliases[_LAYER_COUNT][6] = {
@@ -477,6 +481,7 @@ static const char companion_layer_aliases[_LAYER_COUNT][6] = {
     [_FN1]  = "FN1",
     [_FN2]  = "FN2",
     [_SYS]  = "SYS",
+    [_GAME] = "GAME",
 };
 
 static const status_hsv_t status_level_colors[] = {
@@ -496,7 +501,7 @@ static const status_hsv_t status_scroll_lock_color = {HSV_CYAN};
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT(
         KC_ESC  , KC_LBRC , KC_LCBR , KC_RCBR , KC_LPRN , KC_EQUAL, PREC_MOD,                     KC_NO   , KC_ASTR , KC_RPRN , KC_PLUS , KC_RBRC , KC_EXLM , KC_BSPC,
-        MO(_SH2), KC_SCLN , KC_COMM , KC_DOT  , KC_P    , KC_Y    , KC_TAB  ,                     KC_NO   , KC_F    , KC_G    , KC_C    , KC_R    , KC_L    , MO(_SH2),
+        MO(_SH2), KC_SCLN , KC_COMM , KC_DOT  , KC_P    , KC_Y    , KC_TAB  ,                     GAME_TOG, KC_F    , KC_G    , KC_C    , KC_R    , KC_L    , MO(_SH2),
         KC_LSFT , KC_A    , KC_O    , KC_E    , KC_U    , KC_I    , TT(_NUM),                     TT(_FN1), KC_D    , KC_H    , KC_T    , KC_N    , KC_S    , KC_RSFT,
         KC_LCTL , KC_QUOT , KC_Q    , KC_J    , KC_K    , KC_X    , SCRL_MOD,                     TT(_SYS), KC_B    , KC_M    , KC_W    , KC_V    , KC_Z    , KC_RCTL,
                             KC_LALT , KC_LGUI , LCLK    ,                                                             TT(_MOU), KC_RGUI , KC_RALT,
@@ -519,8 +524,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_MOU] = LAYOUT(
         KC_TRNS      , KC_NO        , KC_NO        , KC_NO        , KC_NO        , KC_NO        , TB_BASE      ,                               TB_BASE      , KC_NO        , KC_NO        , KC_NO        , KC_NO        , KC_NO        , KC_TRNS,
         KC_TRNS      , KC_NO        , KC_NO        , KC_NO        , KC_NO        , KC_NO        , KC_TRNS      ,                               SCRL_UP      , CPI_UP       , MBCK         , KC_NO        , MFWD         , TB_R_SMRT_KEY, KC_TRNS,
-        KC_TRNS      , KC_NO        , KC_NO        , KC_NO        , KC_NO        , KC_NO        , KC_NO        ,                               SCRL_DOWN    , CPI_DOWN     , LCLK         , RCLK         , SCRL_MOD         , TB_R_SMRT_KEY, KC_TRNS,
-        KC_TRNS      , KC_NO        , KC_NO        , KC_NO        , KC_NO        , KC_NO        , SCRL_MOD     ,                               SCRL_DFLT    , CPI_DFLT     , TB_L_ZOOM_KEY, MCLK , TB_R_SMRT_KEY, TB_R_PAN_KEY , KC_TRNS,
+        KC_TRNS      , KC_NO        , KC_NO        , KC_NO        , KC_NO        , KC_NO        , KC_NO        ,                               SCRL_DOWN    , CPI_DOWN     , LCLK         , RCLK         , SCRL_MOD     , TB_R_SMRT_KEY, KC_TRNS,
+        KC_TRNS      , KC_NO        , KC_NO        , KC_NO        , KC_NO        , KC_NO        , SCRL_MOD     ,                               SCRL_DFLT    , CPI_DFLT     , TB_L_ZOOM_KEY, MCLK         , TB_R_SMRT_KEY, TB_R_PAN_KEY , KC_TRNS,
                                       KC_TRNS      , KC_TRNS      , KC_TRNS      ,                                                                                           KC_TRNS      , KC_TRNS      , KC_TRNS,
                                                                     KC_TRNS      ,                                                                                           KC_TRNS,
                                                                                    KC_TRNS      ,                                                             KC_TRNS,
@@ -540,10 +545,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_NUM] = LAYOUT(
         KC_TRNS, KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , TB_BASE,                   TB_BASE, KC_NUM , KC_PSLS, KC_PAST, KC_PMNS, KC_NO  , KC_TRNS,
-        KC_TRNS, KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_TRNS,                   KC_NO  , KC_P7  , KC_P8  , KC_P9  , KC_PPLS, KC_NO  , KC_TRNS,
-        KC_TRNS, KC_LSFT, KC_LCTL, KC_LALT, KC_LGUI, KC_NO  , KC_NO  ,                   KC_NO  , KC_P4  , KC_P5  , KC_P6  , KC_PENT, KC_NO  , KC_TRNS,
-        KC_TRNS, KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  ,                   KC_NO  , KC_P1  , KC_P2  , KC_P3  , KC_PDOT, KC_NO  , KC_TRNS,
-                          KC_TRNS, KC_TRNS, KC_TRNS,                                                       KC_TRNS, KC_P0  , KC_TRNS,
+        KC_TRNS, KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_TRNS,                   KC_NO  , KC_NO  , KC_P7  , KC_P8  , KC_P9  , KC_PPLS, KC_TRNS,
+        KC_TRNS, KC_LSFT, KC_LCTL, KC_LALT, KC_LGUI, KC_NO  , KC_NO  ,                   KC_NO  , KC_NO  , KC_P4  , KC_P5  , KC_P6  , KC_PPLS, KC_TRNS,
+        KC_TRNS, KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  ,                   KC_NO  , KC_NO  , KC_P1  , KC_P2  , KC_P3  , KC_PENT, KC_TRNS,
+                          KC_TRNS, KC_TRNS, KC_TRNS,                                                       KC_TRNS, KC_P0  , KC_PDOT,
                                             KC_TRNS,                                                       KC_TRNS,
                                                      KC_TRNS,                                     KC_TRNS,
                                                               KC_TRNS,                   KC_TRNS
@@ -580,6 +585,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                                     KC_TRNS  ,                                                                   KC_TRNS,
                                                                KC_TRNS  ,                                             KC_TRNS,
                                                                           KC_TRNS  ,                       KC_TRNS
+    ),
+
+    [_GAME] = LAYOUT(
+        KC_ESC  , KC_NO   , KC_1    , KC_2    , KC_3    , KC_4    , KC_5    ,                     TO_BASE , KC_6    , KC_7    , KC_8    , KC_9    , KC_0    , KC_BSPC,
+        KC_NO   , KC_TAB  , KC_Q    , KC_W    , KC_E    , KC_R    , KC_T    ,                     GAME_TOG, KC_Y    , KC_U    , KC_I    , KC_O    , KC_P    , KC_BSLS,
+        KC_NO   , KC_LSFT , KC_A    , KC_S    , KC_D    , KC_F    , KC_G    ,                     KC_NO   , KC_H    , KC_J    , KC_K    , KC_L    , KC_SCLN , KC_QUOT,
+        KC_NO   , KC_LCTL , KC_Z    , KC_X    , KC_C    , KC_V    , KC_B    ,                     KC_NO   , KC_N    , KC_M    , KC_COMM , KC_DOT  , KC_SLSH , KC_RCTL,
+                            KC_LALT , KC_LGUI , KC_SPC  ,                                                             TT(_MOU), KC_RGUI , KC_RALT,
+                                                KC_ENT  ,                                                             KC_SPC,
+                                                          RCLK    ,                                         TT(_FN1),
+                                                                    MCLK    ,                     TT(_NAV)
     )
 
 };
