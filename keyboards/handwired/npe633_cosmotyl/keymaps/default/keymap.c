@@ -592,8 +592,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_NO   , KC_TAB  , KC_Q    , KC_W    , KC_E    , KC_R    , KC_T    ,                     GAME_TOG, KC_Y    , KC_U    , KC_I    , KC_O    , KC_P    , KC_BSLS,
         KC_NO   , KC_LSFT , KC_A    , KC_S    , KC_D    , KC_F    , KC_G    ,                     KC_NO   , KC_H    , KC_J    , KC_K    , KC_L    , KC_SCLN , KC_QUOT,
         KC_NO   , KC_LCTL , KC_Z    , KC_X    , KC_C    , KC_V    , KC_B    ,                     KC_NO   , KC_N    , KC_M    , KC_COMM , KC_DOT  , KC_SLSH , KC_RCTL,
-                            KC_LALT , KC_LGUI , KC_SPC  ,                                                             TT(_MOU), KC_RGUI , KC_RALT,
-                                                KC_ENT  ,                                                             KC_SPC,
+                            KC_LALT , KC_LGUI , LCLK    ,                                                             TT(_MOU), KC_RGUI , KC_RALT,
+                                                KC_SPC  ,                                                             KC_ENT,
                                                           RCLK    ,                                         TT(_FN1),
                                                                     MCLK    ,                     TT(_NAV)
     )
