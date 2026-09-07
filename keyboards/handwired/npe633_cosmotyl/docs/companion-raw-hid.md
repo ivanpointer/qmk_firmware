@@ -45,7 +45,7 @@ The protocol has four traffic tiers:
 | Class | Name | Payload |
 | --- | --- | --- |
 | 0 | Identity | Version, class count, status light count, default scroll level, default CPI level, layer count |
-| 1 | Layer | Active layer ID |
+| 1 | Layer | Active layer ID, activation kind |
 | 2 | Locks | Bit 0 Caps Lock, bit 1 Num Lock, bit 2 Scroll Lock |
 | 3 | Trackball | Left mode, right mode, held/latched flags |
 | 4 | Levels | Current scroll level, current CPI level, flags |
@@ -86,6 +86,11 @@ Class 1 is the current active layer state. Layer names are reported separately b
 | Offset | Description |
 | --- | --- |
 | 0 | Active layer ID |
+| 1 | Activation kind: `0` current/unspecified, `1` transient, `2` persistent |
+
+Older one-byte layer payloads should be treated as activation kind `0`.
+
+Activation kind is generic keyboard-state metadata, not audio-specific policy. `Transient` means the layer was entered through hold-style behavior expected to revert on key release, such as `MO`, held `TT`, held `LT`, or `LM`. `Persistent` means the layer was entered or promoted through state that is not expected to revert on key release, such as `TG`, `TO`, or the final `TT` tap that toggles the layer on. For `TT(layer)`, firmware may emit a transient event as soon as the layer is entered, then a persistent event for the same active layer if the tap-toggle threshold promotes it to toggled-on state.
 
 ### Layer color payload, class 9
 

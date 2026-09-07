@@ -34,7 +34,7 @@ Caps Lock, Num Lock, and Scroll Lock are host lock state, not companion-app stat
 
 On cold boot, status frames stay quiet until USB configures or the firmware receives a suspend callback. After the keyboard has configured at least once, later KVM-induced deconfigure/reset states are rendered as the no-host pattern instead of leaving stale LEDs on either half.
 
-On the USB/master half only, if USB has configured once and later remains unconfigured for 8 seconds, the firmware restarts the USB device driver to prompt host re-enumeration. Retries are rate-limited to 20 seconds. Split transport loss is deliberately ignored by this recovery path, so a single working half is not treated as a bad state.
+On the USB/master half only, if USB has configured once and later remains unconfigured or suspended for 3 seconds, the firmware restarts the USB device driver to prompt host re-enumeration. Retries are rate-limited to 3 seconds so KVM switching can reconnect quickly. Split transport loss is deliberately ignored by this recovery path, so a single working half is not treated as a bad state.
 
 Error codes repeat until the error clears. Only the main status light is taken over by the error code; layer, trackball mode, and pointing status continue to render on their dedicated lights.
 

@@ -15,7 +15,7 @@
 #define MFWD MS_BTN5
 
 // Trackball mode aliases used in the layout below.
-#define SCRL_MOD TB_L_SMRT
+#define SCRL_MOD TB_L_HSCR
 #define SCRL_UP  TB_SCRL_UP
 #define SCRL_DOWN TB_SCRL_DOWN
 #define SCRL_DFLT TB_SCRL_DFLT
@@ -189,6 +189,7 @@ typedef struct {
 
 typedef struct {
     uint8_t active_layer;
+    uint8_t layer_activation_kind;
     uint8_t lock_flags;
     uint8_t left_mode;
     uint8_t right_mode;
@@ -241,8 +242,8 @@ typedef struct {
 #define STATUS_LAYER_BRIGHTNESS_FULL 100
 #define STATUS_LAYER_BRIGHTNESS_MID 80
 #define STATUS_LAYER_BRIGHTNESS_DIM 60
-#define STATUS_USB_RECOVERY_STUCK_MS 8000
-#define STATUS_USB_RECOVERY_RETRY_MS 20000
+#define STATUS_USB_RECOVERY_STUCK_MS 3000
+#define STATUS_USB_RECOVERY_RETRY_MS 3000
 #define TB_MODE_TIMEOUT_MS 1200
 #define TB_AXIS_TIMEOUT_MS 600
 #define TB_AXIS_LOCK_THRESHOLD 4
@@ -358,6 +359,12 @@ enum companion_layer_color_flags {
     COMPANION_LAYER_COLOR_ALTERNATE = 1 << 0,
 };
 
+enum companion_layer_activation_kind {
+    COMPANION_LAYER_ACTIVATION_CURRENT,
+    COMPANION_LAYER_ACTIVATION_TRANSIENT,
+    COMPANION_LAYER_ACTIVATION_PERSISTENT,
+};
+
 typedef struct {
     uint32_t magic;
     uint8_t  version;
@@ -437,7 +444,10 @@ static uint32_t                 companion_remote_poll_timer   = 0;
 static companion_state_t        companion_last_state          = {0};
 static bool                     companion_last_state_valid    = false;
 static layer_state_t            companion_pending_layer_state = 0;
+static uint8_t                  companion_pending_layer_activation_kind = COMPANION_LAYER_ACTIVATION_CURRENT;
 static bool                     companion_layer_state_pending = false;
+static uint8_t                  companion_layer_activation_hint_layer = UINT8_MAX;
+static uint8_t                  companion_layer_activation_hint_kind  = COMPANION_LAYER_ACTIVATION_CURRENT;
 static uint8_t                  companion_sequence            = 0;
 static bool                     companion_query_status_pending = false;
 static bool                     companion_query_config_pending = false;
@@ -452,8 +462,11 @@ static status_hsv_t status_color_for_trackball_mode(enum trackball_mode mode);
 static void status_invalidate_frame_cache(void);
 static void status_usb_recovery_task(void);
 static void companion_invalidate_report_cache(void);
-static void companion_queue_layer_state(layer_state_t active_layer_state);
-static void companion_send_layer_state(layer_state_t active_layer_state);
+static void companion_note_layer_key_event(uint16_t keycode, keyrecord_t *record);
+static uint8_t companion_consume_layer_activation_hint(uint8_t active_layer);
+static void companion_set_layer_activation_hint(uint8_t layer, uint8_t activation_kind);
+static void companion_queue_layer_state(layer_state_t active_layer_state, uint8_t activation_kind);
+static void companion_send_layer_state(layer_state_t active_layer_state, uint8_t activation_kind);
 static void companion_flush_pending_layer_state(void);
 static void companion_task(void);
 static void companion_send_report(uint8_t event_class, uint8_t flags, const uint8_t *payload, uint8_t payload_len);
@@ -656,6 +669,10 @@ static trackball_state_t *trackball_state_for_side(enum trackball_side side) {
     return &trackball_states[side];
 }
 
+static enum trackball_mode trackball_default_mode(enum trackball_side side) {
+    return side == TB_SIDE_LEFT ? TB_MODE_VSCROLL : TB_MODE_CURSOR;
+}
+
 static enum trackball_mode trackball_effective_mode(enum trackball_side side) __attribute__((unused));
 static enum trackball_mode trackball_effective_mode(enum trackball_side side) {
     trackball_state_t *state = trackball_state_for_side(side);
@@ -664,7 +681,11 @@ static enum trackball_mode trackball_effective_mode(enum trackball_side side) {
         return state->held_mode;
     }
 
-    return state->latched_mode;
+    if (state->latched_mode != TB_MODE_CURSOR) {
+        return state->latched_mode;
+    }
+
+    return trackball_default_mode(side);
 }
 
 static void trackball_clear_side(enum trackball_side side) {
@@ -1384,7 +1405,7 @@ static bool status_usb_recovery_should_run(usb_configure_state_t usb_state) {
     }
 #endif
 
-    return status_seen_configured_host && !status_suspended && usb_state != USB_DEVICE_STATE_CONFIGURED;
+    return status_seen_configured_host && usb_state != USB_DEVICE_STATE_CONFIGURED;
 }
 
 static void status_usb_recovery_note_configured(void) {
@@ -1831,7 +1852,8 @@ static void companion_send_class(uint8_t event_class, companion_state_t state) {
 
         case COMPANION_CLASS_LAYER:
             payload[0] = state.active_layer;
-            payload_len = 1;
+            payload[1] = state.layer_activation_kind;
+            payload_len = 2;
             break;
 
         case COMPANION_CLASS_LOCKS:
@@ -1910,15 +1932,16 @@ static void companion_send_class(uint8_t event_class, companion_state_t state) {
     companion_send_report(event_class, flags, payload, payload_len);
 }
 
-static void companion_send_layer_state(layer_state_t active_layer_state) {
+static void companion_send_layer_state(layer_state_t active_layer_state, uint8_t activation_kind) {
     if (!companion_report_ready()) {
         return;
     }
 
     companion_state_t state = {
-        .active_layer    = status_active_layer_from_state(active_layer_state),
-        .local_side_left = true,
-        .master          = true,
+        .active_layer           = status_active_layer_from_state(active_layer_state),
+        .layer_activation_kind  = activation_kind,
+        .local_side_left        = true,
+        .master                 = true,
     };
 
 #ifdef SPLIT_KEYBOARD
@@ -1926,20 +1949,23 @@ static void companion_send_layer_state(layer_state_t active_layer_state) {
     state.master          = is_keyboard_master();
 #endif
 
-    if (companion_last_state_valid && companion_last_state.active_layer == state.active_layer) {
+    if (companion_last_state_valid && companion_last_state.active_layer == state.active_layer &&
+        companion_last_state.layer_activation_kind == state.layer_activation_kind) {
         return;
     }
 
     companion_send_class(COMPANION_CLASS_LAYER, state);
 
     if (companion_last_state_valid) {
-        companion_last_state.active_layer = state.active_layer;
+        companion_last_state.active_layer          = state.active_layer;
+        companion_last_state.layer_activation_kind = state.layer_activation_kind;
     }
 }
 
-static void companion_queue_layer_state(layer_state_t active_layer_state) {
-    companion_pending_layer_state = active_layer_state;
-    companion_layer_state_pending = true;
+static void companion_queue_layer_state(layer_state_t active_layer_state, uint8_t activation_kind) {
+    companion_pending_layer_state           = active_layer_state;
+    companion_pending_layer_activation_kind = activation_kind;
+    companion_layer_state_pending           = true;
 }
 
 static void companion_flush_pending_layer_state(void) {
@@ -1947,7 +1973,7 @@ static void companion_flush_pending_layer_state(void) {
         return;
     }
 
-    companion_send_layer_state(companion_pending_layer_state);
+    companion_send_layer_state(companion_pending_layer_state, companion_pending_layer_activation_kind);
 
     if (companion_report_ready()) {
         companion_layer_state_pending = false;
@@ -1957,7 +1983,7 @@ static void companion_flush_pending_layer_state(void) {
 static bool companion_state_class_changed(uint8_t event_class, companion_state_t previous, companion_state_t current) {
     switch (event_class) {
         case COMPANION_CLASS_LAYER:
-            return previous.active_layer != current.active_layer;
+            return previous.active_layer != current.active_layer || previous.layer_activation_kind != current.layer_activation_kind;
 
         case COMPANION_CLASS_LOCKS:
             return previous.lock_flags != current.lock_flags;
@@ -2350,6 +2376,7 @@ void notify_usb_device_state_change_user(struct usb_device_state usb_state) {
 
 void suspend_power_down_user(void) {
     status_suspended = true;
+    status_usb_recovery_task();
     status_invalidate_frame_cache();
     status_render();
 }
@@ -2362,7 +2389,9 @@ void suspend_wakeup_init_user(void) {
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-    companion_queue_layer_state(state);
+    uint8_t active_layer     = status_active_layer_from_state(state);
+    uint8_t activation_kind  = companion_consume_layer_activation_hint(active_layer);
+    companion_queue_layer_state(state, activation_kind);
     return state;
 }
 
@@ -2514,6 +2543,66 @@ static bool trackball_keycode_to_mode(uint16_t keycode, enum trackball_side *sid
     return false;
 }
 
+static void companion_set_layer_activation_hint(uint8_t layer, uint8_t activation_kind) {
+    companion_layer_activation_hint_layer = layer;
+    companion_layer_activation_hint_kind  = activation_kind;
+}
+
+static uint8_t companion_consume_layer_activation_hint(uint8_t active_layer) {
+    uint8_t activation_kind = COMPANION_LAYER_ACTIVATION_CURRENT;
+
+    if (companion_layer_activation_hint_layer == active_layer) {
+        activation_kind = companion_layer_activation_hint_kind;
+    }
+
+    companion_layer_activation_hint_layer = UINT8_MAX;
+    companion_layer_activation_hint_kind  = COMPANION_LAYER_ACTIVATION_CURRENT;
+
+    return activation_kind;
+}
+
+static void companion_note_layer_key_event(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case QK_MOMENTARY ... QK_MOMENTARY_MAX:
+            if (record->event.pressed) {
+                companion_set_layer_activation_hint(QK_MOMENTARY_GET_LAYER(keycode), COMPANION_LAYER_ACTIVATION_TRANSIENT);
+            }
+            break;
+
+        case QK_LAYER_MOD ... QK_LAYER_MOD_MAX:
+            if (record->event.pressed) {
+                companion_set_layer_activation_hint(QK_LAYER_MOD_GET_LAYER(keycode), COMPANION_LAYER_ACTIVATION_TRANSIENT);
+            }
+            break;
+
+        case QK_LAYER_TAP ... QK_LAYER_TAP_MAX:
+            if (record->event.pressed && record->tap.count == 0) {
+                companion_set_layer_activation_hint(QK_LAYER_TAP_GET_LAYER(keycode), COMPANION_LAYER_ACTIVATION_TRANSIENT);
+            }
+            break;
+
+        case QK_LAYER_TAP_TOGGLE ... QK_LAYER_TAP_TOGGLE_MAX:
+            if (record->event.pressed && record->tap.count < TAPPING_TOGGLE) {
+                companion_set_layer_activation_hint(QK_LAYER_TAP_TOGGLE_GET_LAYER(keycode), COMPANION_LAYER_ACTIVATION_TRANSIENT);
+            } else if (!record->event.pressed && record->tap.count == TAPPING_TOGGLE) {
+                companion_set_layer_activation_hint(QK_LAYER_TAP_TOGGLE_GET_LAYER(keycode), COMPANION_LAYER_ACTIVATION_PERSISTENT);
+            }
+            break;
+
+        case QK_TOGGLE_LAYER ... QK_TOGGLE_LAYER_MAX:
+            if (record->event.pressed) {
+                companion_set_layer_activation_hint(QK_TOGGLE_LAYER_GET_LAYER(keycode), COMPANION_LAYER_ACTIVATION_PERSISTENT);
+            }
+            break;
+
+        case QK_TO ... QK_TO_MAX:
+            if (record->event.pressed) {
+                companion_set_layer_activation_hint(QK_TO_GET_LAYER(keycode), COMPANION_LAYER_ACTIVATION_PERSISTENT);
+            }
+            break;
+    }
+}
+
 static void trackball_mode_key_pressed(enum trackball_side side, enum trackball_mode mode) {
     trackball_state_t *state = trackball_state_for_side(side);
 
@@ -2528,10 +2617,15 @@ static void trackball_mode_key_pressed(enum trackball_side side, enum trackball_
     trackball_apply_cpi();
 }
 
+static bool trackball_mode_key_can_latch(enum trackball_side side, enum trackball_mode mode) {
+    return !(mode == TB_MODE_HSCROLL && side == TB_SIDE_LEFT);
+}
+
 static void trackball_mode_key_released(enum trackball_side side) {
     trackball_state_t *state = trackball_state_for_side(side);
 
-    if (!state->moved_while_held && timer_elapsed32(state->key_timer) <= TAPPING_TERM && state->held_mode != TB_MODE_CURSOR) {
+    if (!state->moved_while_held && timer_elapsed32(state->key_timer) <= TAPPING_TERM && state->held_mode != TB_MODE_CURSOR &&
+        trackball_mode_key_can_latch(side, state->held_mode)) {
         state->latched_mode   = state->held_mode;
         state->activity_timer = timer_read32();
     }
@@ -2548,6 +2642,8 @@ static void trackball_mode_key_released(enum trackball_side side) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     enum trackball_side side;
     enum trackball_mode mode;
+
+    companion_note_layer_key_event(keycode, record);
 
     if (trackball_keycode_to_mode(keycode, &side, &mode)) {
         if (record->event.pressed) {
